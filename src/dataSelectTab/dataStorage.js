@@ -1,11 +1,29 @@
 import Papa from 'papaparse';
 
 
+//数据标识字符
+const FolderName=Object.freeze({
+    TopUni:"TopUniversity",
+    GDP:"GDP",
+    Enroll:"EnrollRate",
+});
+const CountryTransName="ChiEngcountry";
+
 async function fetchCsvData(filePath) {
-    return await fetch(filePath)
-      .then(res => res.text())
-      .then(res => Papa.parse(res, { header: true }).data)
-      .catch(e => console.error(e));
+    //fetch相对目录下的csv文件，/../../public/XXX.csv
+    //await 同步，等结果。
+    const res=await fetch(filePath);
+    let tableObj=null;
+    if(res.ok){
+        const strSCV=await res.text();
+        tableObj=Papa.parse(strSCV,{header:true});
+    }else{
+        //throw `Cannot find csv file from ${filePath}.\nAn Error Occured! Code:${res.status}`;
+        console.error(`Cannot find csv file from ${filePath}.\nAn Error Occured! Code:${res.status}`);
+        return [];
+    }
+    //keyword replace to suit for api:
+    return tableObj.data;
 }
 
 //数据的最小形式
@@ -26,29 +44,29 @@ class DataPerCPerY{
     country="";
     year=2012;
 
-    //在榜高校数目,国家实力,入学率,一个数组，用enum获取
-    dataList=[Object.create(Unitdata)
-        ,Object.create(Unitdata),
-        Object.create(Unitdata)]
+    //name, equals to country in Chinese.Used in World Map.
+    name="";
 
-    constructor(country,year){
+    //在榜高校数目,国家实力,入学率,一个数组，用enum获取
+    dataList=null;
+
+    constructor(country,name,year){
         this.country=country;
+        this.name=name;
         this.year=year;
+        this.dataList=[Object.create(Unitdata)
+            ,Object.create(Unitdata),
+            Object.create(Unitdata)];
     }
 
     setData(dataType,rank,data){
-        this.dataList[DataTypeEnum[dataType]].rank=rank;
-        this.dataList[DataTypeEnum[dataType]].data=data;
+        this.dataList[dataType].rank=rank;
+        this.dataList[dataType].data=data;
     }
     getData(dataType){
-        return this.dataList[DataTypeEnum[dataType]];
+        return this.dataList[dataType];
     }
     getCountry(){
-        return this.country;
-    }
-
-    //name, equals to country.Used in World Map.
-    get name(){
         return this.country;
     }
 
@@ -59,9 +77,6 @@ class DataPerCPerY{
 
 //使用papaLoader读入数据
 export default class DataStorage{
-    constructor(){
-        this.init();
-    }
     /*{[year:number]:    
         [
             oneSegment:DataPerCPerY,
@@ -72,9 +87,18 @@ export default class DataStorage{
     }
     */
     allData={};
-    
+
+    //real Chinese to English Dictionary.
+    dictionary=null;
+
+    renewDataSet=null;
     startYear=2012;
     endYear=2022;
+
+    constructor(renewDataSet){
+        this.init();
+        this.renewDataSet=renewDataSet;
+    }
     
     //rank only when needed.
     /*
@@ -96,34 +120,61 @@ export default class DataStorage{
     rankedData={};
 
     async init(){
-        //fetchCsvData("");
-        const oneYearData=[];
-        for(let year=DataStorage.startYear;year<DataStorage.endYear;year++){
+        //open the English-Chinese Country map for search.
+        this.dictionary=await fetchCsvData(`/${CountryTransName}.csv`);
+        
+        for(let year=this.startYear;year<=this.endYear;year++){
             let dataPerY=[];
-            for(let one of oneYearData){
-                const piece=new DataPerCPerY(one.country,one.year);
-                piece.setData(DataTypeEnum.GoodUni,);
-                piece.setData(DataTypeEnum.GDP,);
-                piece.setData(DataTypeEnum.Enroll,);
+            const TopUniCSV=await fetchCsvData(`/${FolderName.TopUni}/${year}.csv`);
+            const TopGDPCSV=await fetchCsvData(`/${FolderName.GDP}/${year}.csv`);
+            console.log(TopUniCSV);
+            
+            for(let one of TopUniCSV){
+                const piece=new DataPerCPerY(one.country,this.getChineseName(one.country),year);
+                piece.setData(DataTypeEnum.GoodUni,one.rank,one.data);
+                //piece.setData(DataTypeEnum.GDP,);
+                //piece.setData(DataTypeEnum.Enroll,);
                 dataPerY.push(piece);
             }
-            DataStorage.allData[year]=dataPerY;
+            this.allData[year]=dataPerY;
         }
+        //uncapture the change of DataStorage, call APP to setState and update.
+        this.renewDataSet(this);
     }
 
+    getChineseName=(english)=>{
+        for(let one of this.dictionary){
+            if(one.English===english){
+                return one.Chinese;
+            }
+        }
+        return "未知国家";
+    }
 
     //main function of get data used in worldMap and rankBoard,need a rank operation.
     getDataByYear=(year,dataType)=>{
-        const TypeIndex=DataTypeEnum[dataType];
-        if(this.rankedData[year]!==undefined && this.rankedData[year][TypeIndex]!==undefined){
-            return this.rankedData[year][TypeIndex];
+        console.log("try to get data by year!");
+        //wait the render of allData.
+        if(this.allData[year]===undefined) return [];
+
+        if(this.rankedData[year]!==undefined && this.rankedData[year][dataType]!==undefined){
+            const ranked=this.rankedData[year][dataType];
+            for(let one of ranked){
+                const piece=one.getData(dataType);
+                one.value=piece.data;
+                one.rank=piece.rank;
+                one.key=piece.rank;
+            }
+            return this.rankedData[year][dataType];
         }
+
         if(this.rankedData[year]===undefined){
             this.rankedData[year]=[];
         }
         const dataListInOrder=[];
         //one:DataPerCPerY
-        for(let one of this.allData[year]){
+        const dataPerY=this.allData[year];
+        for(let one of dataPerY){
             //piece:DataUnit
             const piece=one.getData(dataType);
             //not so elegant to add property into data object,
@@ -132,10 +183,11 @@ export default class DataStorage{
             //all we need: value=data in dataList, rank=rank in dataList.
             one.value=piece.data;
             one.rank=piece.rank;
-            dataListInOrder[piece.rank]=one;
+            one.key=piece.rank;
+            dataListInOrder[piece.rank-1]=one;
         }
-        this.rankedData[year][TypeIndex]=dataListInOrder;
-        return this.rankedData[year][TypeIndex];
+        this.rankedData[year][dataType]=dataListInOrder;
+        return this.rankedData[year][dataType];
     }
 
     //find country data of all years, all dataType, mainly used in ZoneIn map.

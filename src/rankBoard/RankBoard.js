@@ -2,9 +2,22 @@ import {Avatar,Table} from "antd";
 import React from "react";
 
 
-function getIconStyle(index){
-    let ret={};
-    const BGC="backgroundColor";
+function getIconClass(index){
+    let ret="normalIcon";
+    index=parseInt(index);
+    switch(index){
+        case 1:
+            ret="firstPlaceIcon";
+            break;
+        case 2:
+            ret="secondPlaceIcon";
+            break;
+        case 3:
+            ret="thirdPlaceIcon";
+            break;
+    }
+    return ret;
+    /*const BGC="backgroundColor";
     const C="color"
     ret["fontSize"]="15px";
     ret["fontWeight"]="bold";
@@ -25,8 +38,7 @@ function getIconStyle(index){
             ret[C]="#919191";
             ret[BGC]="#FFFFFF";
             break;
-    }
-    return ret;
+    }*/
 }
 
 
@@ -36,13 +48,13 @@ const TableColumn=[
         className:"normalText",
         dataIndex:"rank",
         render: (rank)=>{
-            return (<Avatar style={getIconStyle(rank)}>{rank}</Avatar>);
+            return (<Avatar className={getIconClass(rank)}>{rank}</Avatar>);
         }
     },
     {
         title:"国家",
         className:"normalText",
-        dataIndex:"country",
+        dataIndex:"name",
     },
     {
         title:"数据",
@@ -57,7 +69,8 @@ export default class RankBoard extends React.Component{
     }
     
     getTableData=()=>{
-        //const ret=this.props.getDataSource();
+        const ret=this.props.getDataSource();
+        /* //fake data
         const ret=[];
         for(let q=1;q<100;q++){
             ret.push({
@@ -66,7 +79,7 @@ export default class RankBoard extends React.Component{
                 country:`Country ${q}`,
                 value:999-q,
             });
-        }
+        }*/
         return ret;
     }
 
@@ -112,7 +125,7 @@ export default class RankBoard extends React.Component{
                     };
                 }}
                 scroll={{
-                    y: 240,
+                    y: 300,
                 }}/>
             </div>
         );

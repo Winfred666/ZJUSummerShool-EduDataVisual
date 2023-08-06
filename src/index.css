@@ -95,6 +95,34 @@ body{
     background-color: #b0e1ff;
 }
 
+.normalIcon{
+    font-size: 15px;
+    font-weight: bold;
+    color: #919191;
+    background-color: white;
+}
+
+.firstPlaceIcon{
+    font-size: 15px;
+    font-weight: bold;
+    color: #ff5200;
+    background-color: #fde3cf;
+}
+
+.secondPlaceIcon{
+    font-size: 15px;
+    font-weight: bold;
+    color:#ff8d00;
+    background-color: #FDF1CF;
+}
+
+.thirdPlaceIcon{
+    font-size: 15px;
+    font-weight: bold;
+    color: #e6ca00;
+    background-color: #FFFDD7;
+}
+
 .ant-table-tbody > tr:hover:not(.ant-table-expanded-row) > td {
 	background-color: rgb(190, 246, 255)!important;
 }

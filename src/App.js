@@ -18,7 +18,7 @@ export default class App extends Component{
     constructor(props){
         super(props);
         //初始化数据
-        const dataSet=new DataStorage();
+        const dataSet=new DataStorage(this.renewDataSet);
         this.state={
             dataSet:dataSet,
             curDataType:DataTypeEnum.GoodUni,
@@ -26,6 +26,9 @@ export default class App extends Component{
             displayTop:100,
             selectCountry:null,
         }
+    }
+    renewDataSet=(newDataSet)=>{
+        this.setState({dataSet:newDataSet});
     }
 
     getCurYearData=()=>{
@@ -64,7 +67,7 @@ export default class App extends Component{
                     <WorldMap getDataSource={this.getCurYearData}></WorldMap>
                     <TimeLine  startYear={this.state.dataSet.startYear} onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}></TimeLine>
                     <DataSelectTab onTypeChange={this.setDataType} onPercentChange={this.setDisplayTop}></DataSelectTab>
-                    <RankBoard getDataSource={this.getCurYearData} onSelectChange={this.onSelectChange}></RankBoard>
+                    <RankBoard getDataSource={this.getCurYearData} onSelectChange={this.setSelectCountry}></RankBoard>
                  </ConfigProvider>
             </div>
         );
