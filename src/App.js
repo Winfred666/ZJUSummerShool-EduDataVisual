@@ -1,35 +1,71 @@
 import React,{Component} from "react";
+import DataSelectTab from "./dataSelectTab/DataSelectTab";
+import RankBoard from "./rankBoard/RankBoard";
+import TimeLine from "./timeLine/TimeLine";
+import WorldMap from "./worldMap/WorldMap";
 
-const flag=false;
-const obj=[
-    {id:1,content:"fd"},
-    {id:2,content:"dd"},
-    {id:3,content:"fdas"},
-]
+import "antd/dist/reset.css";
+import { ConfigProvider,theme} from "antd";
+import DataStorage, { DataTypeEnum } from "./dataSelectTab/dataStorage";
 
+
+
+//App中具有dataStorage
+//作为父组件，给四大板块组件分发data
+//接收四大板块的更改信息
 export default class App extends Component{
+    state=null
+    constructor(props){
+        super(props);
+        //初始化数据
+        const dataSet=new DataStorage();
+        this.state={
+            dataSet:dataSet,
+            curDataType:DataTypeEnum.GoodUni,
+            curYear:dataSet.startYear,
+            displayTop:100,
+            selectCountry:null,
+        }
+    }
+
+    getCurYearData=()=>{
+        return this.state.dataSet.getDataByYear(
+            this.state.curYear,this.state.curDataType
+        );
+    }
+    
+    setCurYear=(year)=>{
+        this.setState({curYear:year});
+    }
+
+    setDisplayTop=(percent)=>{
+        this.setState({displayTop:percent});
+    }
+
+    //if country===null, then go back to WorldMap mode, else ZoneIn to that country.
+    setSelectCountry=(country)=>{
+        this.setState({selectCountry:country});
+    }
+
+    setDataType=(dataType)=>{
+        this.setState({curDataType:dataType});
+    }
+
     render(){
         return(
             <div className="gridMother">
-                 <div className="mainBoard">
-                    三元表达式
-                    <br></br>
-                    {flag ?"hahah":"444"}
-                    <div className="timeLine">
-                    <ul>
-                    循环渲染
-                    {obj.map(({id,content})=>
-                        (<li key={id}>
-                            {id}|{content}
-                        </li>)
-                        )
-                    }
-                    </ul>
-                    条件渲染
-                    </div>
-                 </div>
-                 <div className="assistBoard">
-                 </div>
+                 <ConfigProvider
+                 theme={{
+                    algorithm:theme.compactAlgorithm,
+                    token:{
+                        colorPrimary:"#007fcc",
+                    },
+                 }}>
+                    <WorldMap getDataSource={this.getCurYearData}></WorldMap>
+                    <TimeLine  startYear={this.state.dataSet.startYear} onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}></TimeLine>
+                    <DataSelectTab onTypeChange={this.setDataType} onPercentChange={this.setDisplayTop}></DataSelectTab>
+                    <RankBoard getDataSource={this.getCurYearData} onSelectChange={this.onSelectChange}></RankBoard>
+                 </ConfigProvider>
             </div>
         );
     }
