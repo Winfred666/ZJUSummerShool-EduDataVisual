@@ -122,6 +122,11 @@ body{
     background-color: #FFFDD7;
 }
 
+.fadedWorldMap{
+    transition: all 0.5s;
+    opacity: 0.3;
+}
+
 .hoverChart{
     position: absolute;
     background: none;

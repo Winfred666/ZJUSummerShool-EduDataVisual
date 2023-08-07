@@ -50,9 +50,6 @@ class DataPerCPerY{
     //在榜高校数目,国家实力,入学率,一个数组，用enum获取
     dataList=null;
 
-    centerX=undefined;
-    centerY=undefined;
-
     constructor(country,name,year){
         this.country=country;
         this.name=name;
@@ -62,15 +59,11 @@ class DataPerCPerY{
             Object.create(Unitdata)];
     }
 
-    setCenter(centerX,centerY){
-        this.centerX=centerX;
-        this.centerY=centerY;
-    }
-
     setData(dataType,rank,data){
         this.dataList[dataType].rank=rank;
         this.dataList[dataType].data=data;
     }
+
     getData(dataType){
         return this.dataList[dataType];
     }
@@ -142,8 +135,6 @@ export default class DataStorage{
                 let translation=this.getCountryPackage(one.country);
                 if(translation===undefined || translation===null) continue;
                 const piece=new DataPerCPerY(one.country,translation.Chinese,year);
-                piece.setCenter(translation.centerX,translation.centerY);
-                
                 piece.setData(DataTypeEnum.GoodUni,one.rank,one.data);
                 //piece.setData(DataTypeEnum.GDP,);
                 //piece.setData(DataTypeEnum.Enroll,);
@@ -170,9 +161,12 @@ export default class DataStorage{
         //wait the render of allData.
         if(this.allData[year]===undefined) return [];
 
+        //if rankedData has been generated
         if(this.rankedData[year]!==undefined && this.rankedData[year][dataType]!==undefined){
             const ranked=this.rankedData[year][dataType];
+            //renew value and rank of this dataType
             for(let one of ranked){
+                if(!one) break;
                 const piece=one.getData(dataType);
                 one.value=piece.data;
                 one.rank=piece.rank;
@@ -207,14 +201,21 @@ export default class DataStorage{
     getDataByCountry=(country)=>{
         country=country.toUpperCase();
         const ret={};
+        //whether this country has data.
+        let flag=false;
         for(let year=this.startYear;year<=this.endYear;year++){
             //one:DataPerCPerY
             for(let one of this.allData[year]){
-                //匹配到国家
+                //match country English name
                 if(one.getCountry().toUpperCase()===country){
+                    flag=true;
                     ret[year]=one;
                     break;
                 }
+            }
+            if(!flag){
+                //set default value
+                ret[year]=null;
             }
         }
         return ret;

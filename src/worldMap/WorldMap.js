@@ -10,6 +10,10 @@ echarts.use([MapChart]);
 const mapName="world";
 
 export default class WorldMap extends React.Component{
+    //只用作本组件判断当前是否缩放，用于侦听改动。
+    state={
+        selectCountry:null,
+    }
     //存储地图对象
     myMap=null;
     //存储所需数据的引用
@@ -62,7 +66,7 @@ export default class WorldMap extends React.Component{
             }
         ],
     };
-
+    
     //已经commit，使用DOM初始化地图
     componentDidMount(){
         const MapContainer=document.getElementById("worldMapCore");
@@ -80,6 +84,25 @@ export default class WorldMap extends React.Component{
         //更新数据
         this.mapOptions.series[0].data=this.props.getDataSource();
         this.myMap.setOption(this.mapOptions,false,false);
+
+        //检测是否需要更新国家聚焦
+        if(this.props.selectCountry!==this.state.selectCountry){
+            //更新当前状态
+            this.setState({selectCountry:this.props.selectCountry});
+            if(this.props.selectCountry===null){
+                //取消聚焦,变回原来世界地图大小
+                this.mapOptions.series[0].center=undefined;
+                this.mapOptions.series[0].layoutCenter=undefined;
+                this.mapOptions.series[0].zoom="1.1";
+            }else{
+                //实现聚焦,缩放至特定国家大小,模糊化,需要获取国家经纬度/中心点
+                const pack=this.props.getCountryPackage(this.props.selectCountry);
+                this.mapOptions.series[0].center=[pack.centerX,pack.centerY];
+                this.mapOptions.series[0].layoutCenter=["50%","50%"];
+                this.mapOptions.series[0].zoom="8";
+            }
+            this.myMap.setOption(this.mapOptions,false,false);
+        }
     }
 
     //随窗口变化做出的响应
@@ -90,30 +113,20 @@ export default class WorldMap extends React.Component{
 
     //国家点击响应
     clickHandler=(params)=>{
-        if(params.data!==undefined && this.props.selectCountry===null){
+        if(params.data!==undefined && this.props.selectCountry!==params.data.country){
             this.props.setSelectCountry(params.data.country);
-            //缩放至特定国家大小,需要获取国家经纬度/中心点
-            console.log(params);
-            this.mapOptions.series[0].center=[params.data.centerX,params.data.centerY];
-            this.mapOptions.series[0].layoutCenter=["50%","50%"];
-            this.mapOptions.series[0].zoom="8";
-            this.myMap.setOption(this.mapOptions,false,false);
         }else{
             this.props.setSelectCountry(null);
-            //变回原来世界地图大小
-            this.mapOptions.series[0].center=undefined;
-            this.mapOptions.series[0].layoutCenter=undefined;
-            this.mapOptions.series[0].zoom="1.1";
         }
     }
 
     getHoverMapDisplay=()=>{
-        return (this.props.curYear===null)?false : true;
+        return (this.props.selectCountry===null)?false : true;
     }
 
     render(){
         return (<div className="worldMap">
-            <div id="worldMapCore" 
+            <div id="worldMapCore" className={(this.getHoverMapDisplay())?"fadedWorldMap":""}
             style={{width:"100%",height:"100%",position:"absolute"}}
             ></div>
             <div className="normalTitle" style={{
@@ -123,8 +136,7 @@ export default class WorldMap extends React.Component{
                 PointerEvent:"none"}}>
                 世界主要国家
             </div>
-            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay}>
-
+            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.props.getDataByCountry}>
             </AllYearsUniChart>
         </div>);
     }
