@@ -64,7 +64,10 @@ export default class App extends Component{
                         colorPrimary:"#007fcc",
                     },
                  }}>
-                    <WorldMap getDataSource={this.getCurYearData}></WorldMap>
+                    <WorldMap getDataSource={this.getCurYearData}
+                    getDataByCountry={this.state.dataSet.getDataByCountry}
+                    curYear={this.state.curYear}></WorldMap>
+
                     <TimeLine  startYear={this.state.dataSet.startYear} onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}></TimeLine>
                     <DataSelectTab onTypeChange={this.setDataType} onPercentChange={this.setDisplayTop}></DataSelectTab>
                     <RankBoard getDataSource={this.getCurYearData} onSelectChange={this.setSelectCountry}></RankBoard>

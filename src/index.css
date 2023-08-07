@@ -123,6 +123,15 @@ body{
     background-color: #FFFDD7;
 }
 
+.hoverChart{
+    position: absolute;
+    background: none;
+    text-align: center;
+    z-index: 10;
+    width: 300px;
+    height: 250px;
+}
+
 .ant-table-tbody > tr:hover:not(.ant-table-expanded-row) > td {
 	background-color: rgb(190, 246, 255)!important;
 }

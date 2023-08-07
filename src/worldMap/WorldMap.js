@@ -2,6 +2,7 @@ import React from "react";
 import * as echarts from 'echarts';
 import {MapChart} from "echarts/charts";
 import worldGeo from "@surbowl/world-geo-json-zh";
+import AllYearsUniChart from "./AllYearsUniChart";
 
 
 echarts.use([MapChart]);
@@ -24,20 +25,7 @@ export default class WorldMap extends React.Component{
             inRange: {
               color: ['lightskyblue', 'yellow', 'orangered']
             }
-          },
-        // label: {
-        // normal: {
-        //     show: true,
-        //     textStyle: {
-        //     color: '#000000'  //字体颜色
-        //     }
-        // },
-        // emphasis: {
-        //     textStyle: {
-        //     color: '#000000'  //选中后的字体颜色
-        //     }
-        // }
-        // },
+        },
         tooltip: {
             trigger: 'item',
             formatter: (params)=>{
@@ -72,7 +60,7 @@ export default class WorldMap extends React.Component{
                 },
                 data: [],
             }
-        ]
+        ],
     };
 
     //已经commit，使用DOM初始化地图
@@ -99,6 +87,15 @@ export default class WorldMap extends React.Component{
         this.myMap.resize({width:mapDOM.width,height:mapDOM.height});
     }
 
+    //国家点击响应
+    clickHandler=(country)=>{
+        
+    }
+
+    getHoverMapDisplay=()=>{
+        return (this.props.curYear===null)?false : true;
+    }
+
     render(){
 
         return (<div className="worldMap">
@@ -109,7 +106,12 @@ export default class WorldMap extends React.Component{
                 position:"absolute",
                 left:"50%",
                 transform: "translate(-50%, 0)",
-                PointerEvent:"none"}}>世界主要国家</div>
+                PointerEvent:"none"}}>
+                世界主要国家
+            </div>
+            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay}>
+                
+            </AllYearsUniChart>
         </div>);
     }
 }

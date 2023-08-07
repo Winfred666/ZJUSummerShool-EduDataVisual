@@ -15,6 +15,8 @@ function getIconClass(index){
         case 3:
             ret="thirdPlaceIcon";
             break;
+        default:
+            break;
     }
     return ret;
     /*const BGC="backgroundColor";
