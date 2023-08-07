@@ -126,6 +126,15 @@ export default class WorldMap extends React.Component {
         return (this.props.selectCountry === null) ? false : true
     }
 
+    //将选中国家的全年数据传给子组件
+    getSelectedCountryData = () => {
+        if (!this.getHoverMapDisplay()) {
+            return null
+        } else {
+            return (this.props.getDataByCountry(this.props.selectCountry))
+        }
+    }
+
     render () {
         return (<div className="worldMap">
             <div id="worldMapCore" className={(this.getHoverMapDisplay()) ? "fadedWorldMap" : ""}
@@ -139,7 +148,7 @@ export default class WorldMap extends React.Component {
             }}>
                 世界主要国家
             </div>
-            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.props.getDataByCountry}>
+            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
             </AllYearsUniChart>
             <AllYearsGDPChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.props.getDataByCountry}>
             </AllYearsGDPChart>

@@ -92,7 +92,7 @@ export default class RankBoard extends React.Component{
         }
         this.setState({selectIndex:index});
         console.log(record);
-        this.props.onSelectChange(record.country);
+        this.props.setSelectCountry(record.country);
     }
 
     selectBox=()=>{
