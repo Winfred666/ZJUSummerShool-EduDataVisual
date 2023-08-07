@@ -112,7 +112,7 @@ export default class RankBoard extends React.Component{
     render(){
         return (
             <div className="rankBoard">
-                <div className="normalTitle" style={{borderBottom:"3px solid gray"}}>排行榜</div>
+                <div className="normalTitle" style={{borderBottom:"2px solid rgb(146, 207, 216)"}}>排行榜</div>
                 <Table columns={TableColumn} 
                 dataSource={this.getTableData()}
                 pagination={false}

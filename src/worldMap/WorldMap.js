@@ -71,8 +71,9 @@ export default class WorldMap extends React.Component{
         
         this.mapOptions.series[0].data=this.props.getDataSource();
         this.myMap.setOption(this.mapOptions,false,false);
-
+        //添加窗口调整、点击的侦听器
         window.addEventListener("resize",this.resizeWindow);
+        this.myMap.on("click",this.clickHandler);
     }
     
     componentDidUpdate(){
@@ -88,8 +89,22 @@ export default class WorldMap extends React.Component{
     }
 
     //国家点击响应
-    clickHandler=(country)=>{
-        
+    clickHandler=(params)=>{
+        if(params.data!==undefined && this.props.selectCountry===null){
+            this.props.setSelectCountry(params.data.country);
+            //缩放至特定国家大小,需要获取国家经纬度/中心点
+            console.log(params);
+            this.mapOptions.series[0].center=[params.data.centerX,params.data.centerY];
+            this.mapOptions.series[0].layoutCenter=["50%","50%"];
+            this.mapOptions.series[0].zoom="8";
+            this.myMap.setOption(this.mapOptions,false,false);
+        }else{
+            this.props.setSelectCountry(null);
+            //变回原来世界地图大小
+            this.mapOptions.series[0].center=undefined;
+            this.mapOptions.series[0].layoutCenter=undefined;
+            this.mapOptions.series[0].zoom="1.1";
+        }
     }
 
     getHoverMapDisplay=()=>{
@@ -97,7 +112,6 @@ export default class WorldMap extends React.Component{
     }
 
     render(){
-
         return (<div className="worldMap">
             <div id="worldMapCore" 
             style={{width:"100%",height:"100%",position:"absolute"}}
@@ -110,7 +124,7 @@ export default class WorldMap extends React.Component{
                 世界主要国家
             </div>
             <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay}>
-                
+
             </AllYearsUniChart>
         </div>);
     }

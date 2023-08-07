@@ -50,6 +50,9 @@ class DataPerCPerY{
     //在榜高校数目,国家实力,入学率,一个数组，用enum获取
     dataList=null;
 
+    centerX=undefined;
+    centerY=undefined;
+
     constructor(country,name,year){
         this.country=country;
         this.name=name;
@@ -57,6 +60,11 @@ class DataPerCPerY{
         this.dataList=[Object.create(Unitdata)
             ,Object.create(Unitdata),
             Object.create(Unitdata)];
+    }
+
+    setCenter(centerX,centerY){
+        this.centerX=centerX;
+        this.centerY=centerY;
     }
 
     setData(dataType,rank,data){
@@ -130,7 +138,12 @@ export default class DataStorage{
             console.log(TopUniCSV);
             
             for(let one of TopUniCSV){
-                const piece=new DataPerCPerY(one.country,this.getChineseName(one.country),year);
+                //get TransLatePackage used to link more data about one country.
+                let translation=this.getCountryPackage(one.country);
+                if(translation===undefined || translation===null) continue;
+                const piece=new DataPerCPerY(one.country,translation.Chinese,year);
+                piece.setCenter(translation.centerX,translation.centerY);
+                
                 piece.setData(DataTypeEnum.GoodUni,one.rank,one.data);
                 //piece.setData(DataTypeEnum.GDP,);
                 //piece.setData(DataTypeEnum.Enroll,);
@@ -142,13 +155,13 @@ export default class DataStorage{
         this.renewDataSet(this);
     }
 
-    getChineseName=(english)=>{
+    getCountryPackage=(english)=>{
         for(let one of this.dictionary){
             if(one.English===english){
-                return one.Chinese;
+                return one;
             }
         }
-        return "未知国家";
+        return null;
     }
 
     //main function of get data used in worldMap and rankBoard,need a rank operation.

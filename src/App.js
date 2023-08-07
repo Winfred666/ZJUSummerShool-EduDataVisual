@@ -66,7 +66,9 @@ export default class App extends Component{
                  }}>
                     <WorldMap getDataSource={this.getCurYearData}
                     getDataByCountry={this.state.dataSet.getDataByCountry}
-                    curYear={this.state.curYear}></WorldMap>
+                    curYear={this.state.curYear}
+                    setSelectCountry={this.setSelectCountry}
+                    selectCountry={this.state.selectCountry}></WorldMap>
 
                     <TimeLine  startYear={this.state.dataSet.startYear} onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}></TimeLine>
                     <DataSelectTab onTypeChange={this.setDataType} onPercentChange={this.setDisplayTop}></DataSelectTab>
