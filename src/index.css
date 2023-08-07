@@ -120,16 +120,31 @@ body {
   opacity: 0.3;
 }
 
+
+
 .hoverChart {
   position: absolute;
-  bottom: 150px;
-  left: 5px;
+  transition: opacity 0.5s;
   background: none;
   text-align: center;
   z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hoverChartActive{
+  pointer-events: all;
+  opacity: 1;
+}
+
+.hoverTopLeftChart{
+  bottom: 150px;
+  left: 5px;
   width: 360px;
   height: 250px;
 }
+
+
 
 .ant-table-tbody > tr:hover:not(.ant-table-expanded-row) > td {
   background-color: rgb(190, 246, 255) !important;

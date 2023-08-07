@@ -46,14 +46,12 @@ export default class AllYearsGDPChart extends React.Component {
         type: 'value',
         name: '上榜大学数',
         min: 0,
-        max: 250,
         position: 'right',
       },
       {
         type: 'value',
         name: 'GDP',
         min: 0,
-        max: 1800,
         position: 'left',
       }
     ],
@@ -75,23 +73,35 @@ export default class AllYearsGDPChart extends React.Component {
   };
 
   componentDidMount () {
+
     const container = document.getElementById("AllYearsGDPChart")
     this.myMap = echarts.init(container)
-    this.myMap.setOption(this.mapOptions)
+    this.myMap.setOption(this.mapOptions,true)
   }
 
   componentDidUpdate () {
     const countryData = this.props.getDataByCountry()
-    for (let q = 2012; q <= 2022; q++) {
-
-      this.allYearGoodUniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni]
-
+    if(countryData===null){
+      return;
     }
+    for (let q = 2012; q <= 2022; q++) {
+      if(countryData[q]===null|| countryData[q]===undefined || countryData[q].dataList===null){
+        this.allYearGoodUniData[q-2012]=0;
+        this.allYearGDPData[q-2012]=0;
+      }else{
+        this.allYearGoodUniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data;
+        this.allYearGDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data;
+      }
+    }
+
+    this.myMap.setOption(this.mapOptions,true)
   }
 
+  getStyleClass=()=>{
+    return "hoverChart hoverTopLeftChart"+((this.props.shouldDisplay())?" hoverChartActive":"");
+  }
   render () {
-    return (<div style={{ opacity: ((this.props.shouldDisplay) ? 1 : 0) }}
-      className="hoverChart" id="AllYearsGDPChart">
+    return (<div className={this.getStyleClass()} id="AllYearsGDPChart">
     </div>)
   }
 }

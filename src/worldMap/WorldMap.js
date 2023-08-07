@@ -128,7 +128,7 @@ export default class WorldMap extends React.Component {
 
     //将选中国家的全年数据传给子组件
     getSelectedCountryData = () => {
-        if (!this.getHoverMapDisplay()) {
+        if (this.props.selectCountry === null) {
             return null
         } else {
             return (this.props.getDataByCountry(this.props.selectCountry))
@@ -150,7 +150,7 @@ export default class WorldMap extends React.Component {
             </div>
             <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
             </AllYearsUniChart>
-            <AllYearsGDPChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.props.getDataByCountry}>
+            <AllYearsGDPChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
             </AllYearsGDPChart>
         </div>)
     }
