@@ -1,12 +1,6 @@
 import Papa from 'papaparse';
 
 
-//数据标识字符
-const FolderName=Object.freeze({
-    TopUni:"TopUniversity",
-    GDP:"GDP",
-    Enroll:"EnrollRate",
-});
 const CountryTransName="ChiEngcountry";
 
 async function fetchCsvData(filePath) {
@@ -26,9 +20,12 @@ async function fetchCsvData(filePath) {
     return tableObj.data;
 }
 
+
+const FaultRank=300;
+
 //数据的最小形式
 const Unitdata={
-    rank:300,
+    rank:FaultRank,
     data:0,
 };
 
@@ -37,12 +34,21 @@ export const DataTypeEnum=Object.freeze({
     GoodUni:0,
     GDP:1,
     Enroll:2,
+    GoodUni1k:3
+});
+
+//数据标识字符
+const FolderName=Object.freeze({
+    0:"TopUniversity",
+    1:"GDP",
+    2:"EnrollRate",
+    3:"Top1000University",
 });
 
 //一个国家，一个时间点的数据
 class DataPerCPerY{
     country="";
-    year=2012;
+    year=2014;
 
     //name, equals to country in Chinese.Used in World Map.
     name="";
@@ -56,6 +62,7 @@ class DataPerCPerY{
         this.year=year;
         this.dataList=[Object.create(Unitdata)
             ,Object.create(Unitdata),
+            Object.create(Unitdata),
             Object.create(Unitdata)];
     }
 
@@ -73,7 +80,7 @@ class DataPerCPerY{
 
     //change dynamically:
     value=0;
-    rank=200;
+    rank=FaultRank;
 }
 
 //使用papaLoader读入数据
@@ -94,7 +101,7 @@ export default class DataStorage{
 
     renewDataSet=null;
     startYear=2012;
-    endYear=2022;
+    endYear=2023;
 
     constructor(renewDataSet){
         this.init();
@@ -126,19 +133,27 @@ export default class DataStorage{
         
         for(let year=this.startYear;year<=this.endYear;year++){
             let dataPerY=[];
-            const TopUniCSV=await fetchCsvData(`/${FolderName.TopUni}/${year}.csv`);
-            const TopGDPCSV=await fetchCsvData(`/${FolderName.GDP}/${year}.csv`);
-            console.log(TopUniCSV);
-            
-            for(let one of TopUniCSV){
-                //get TransLatePackage used to link more data about one country.
-                let translation=this.getCountryPackage(one.country);
-                if(translation===undefined || translation===null) continue;
-                const piece=new DataPerCPerY(one.country,translation.Chinese,year);
-                piece.setData(DataTypeEnum.GoodUni,one.rank,one.data);
-                //piece.setData(DataTypeEnum.GDP,);
-                //piece.setData(DataTypeEnum.Enroll,);
-                dataPerY.push(piece);
+            //open data csv of different year.
+            for(let typeKey in DataTypeEnum){
+                const dataType=DataTypeEnum[typeKey];
+                const CSV=await fetchCsvData(`/${FolderName[dataType]}/${year}.csv`);
+                if(year===2023){
+                    console.log(CSV);
+                }
+                for(let oneSeg of CSV){
+                    if(oneSeg.data===undefined) continue;
+                    //if DataPerCPerY of this country exists,set new data on it, else create new one.
+                    const index=dataPerY.findIndex((value)=>{return (value.getCountry()===oneSeg.country)});
+                    if(index===-1){
+                        //get TransLatePackage used to link more data about one country.
+                        let translation=this.getCountryPackage(oneSeg.country);
+                        //do not have translation, discard this country.
+                        if(translation===undefined || translation===null) continue;
+                        let curPiece=new DataPerCPerY(oneSeg.country,translation.Chinese,year);
+                        curPiece.setData(dataType,oneSeg.rank,oneSeg.data);
+                        dataPerY.push(curPiece);
+                    }else dataPerY[index].setData(dataType,oneSeg.rank,oneSeg.data);
+                }
             }
             this.allData[year]=dataPerY;
         }
@@ -170,7 +185,6 @@ export default class DataStorage{
                 const piece=one.getData(dataType);
                 one.value=piece.data;
                 one.rank=piece.rank;
-                one.key=piece.rank;
             }
             return this.rankedData[year][dataType];
         }
@@ -181,6 +195,7 @@ export default class DataStorage{
         const dataListInOrder=[];
         //one:DataPerCPerY
         const dataPerY=this.allData[year];
+        let curKey=1;
         for(let one of dataPerY){
             //piece:DataUnit
             const piece=one.getData(dataType);
@@ -188,10 +203,11 @@ export default class DataStorage{
             //but benefit worldMap and rankBoard get the data they want quickly.
             //anyway, follow the principle not change the source data, no error occured:)
             //all we need: value=data in dataList, rank=rank in dataList.
+            if(piece.rank===FaultRank) continue;
             one.value=piece.data;
             one.rank=piece.rank;
-            one.key=piece.rank;
-            dataListInOrder[piece.rank-1]=one;
+            one.key=curKey++;
+            dataListInOrder[one.key-1]=one;
         }
         this.rankedData[year][dataType]=dataListInOrder;
         return this.rankedData[year][dataType];

@@ -51,7 +51,25 @@ export default class App extends Component{
     }
 
     setDataType=(dataType)=>{
-        this.setState({curDataType:dataType});
+        const dataSet=this.state.dataSet;
+        switch(dataType){
+            case DataTypeEnum.GoodUni1k:
+                dataSet.startYear=2014;
+                dataSet.endYear=2023;
+                if(this.state.curYear<2014){
+                    this.setState({curYear:2014});
+                }
+                break;
+            case DataTypeEnum.GoodUni:
+                dataSet.startYear=2012;
+                dataSet.endYear=2023;
+                break;
+            default:
+                dataSet.startYear=2012;
+                dataSet.endYear=2022;
+                break;
+        };
+        this.setState({curDataType:dataType,dataSet:dataSet});
     }
 
     render(){

@@ -4,20 +4,12 @@ import React from "react";
 export default class TimeLine extends React.Component{
     //受控组件
     state={
-        selectYear: 2012,
-        startYear: 2012,
-        endYear:2022,
-    }
-
-    constructor(props){
-        super(props);
-        this.state.selectYear=this.state.startYear=props.startYear;
-        this.state.endYear=props.endYear;
+        selectYear: 2014,
     }
 
     getSliderMark=()=>{
         let ret={};
-        for(let q=this.state.startYear;q<=this.state.endYear;q++){
+        for(let q=this.props.startYear;q<=this.props.endYear;q++){
             const label=q.toString();
             ret[label]=(<div className="normalText">{q.toString()}</div>);
         }
@@ -38,7 +30,7 @@ export default class TimeLine extends React.Component{
                 <div className="normalTitle">时间轴</div>
                 <Slider 
                 marks={this.getSliderMark()} 
-                step={1} min={this.state.startYear} max={this.state.endYear}
+                step={1} min={this.props.startYear} max={this.props.endYear}
                 dots={true} value={this.state.selectYear}
                 onChange={this.sliderChange}
                 ></Slider>
