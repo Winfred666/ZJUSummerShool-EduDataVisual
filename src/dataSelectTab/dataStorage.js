@@ -39,16 +39,16 @@ export const DataTypeEnum=Object.freeze({
 
 //数据标识字符
 const FolderName=Object.freeze({
-    0:"TopUniversity",
-    1:"GDP",
-    2:"EnrollRate",
-    3:"Top1000University",
+    0:"/TopUniversity",
+    1:"/EduExpenseOfGDP",
+    2:"/EnrollRate",
+    3:"/Top1000University",
 });
 
 //一个国家，一个时间点的数据
 class DataPerCPerY{
     country="";
-    year=2014;
+    year=2012;
 
     //name, equals to country in Chinese.Used in World Map.
     name="";
@@ -67,7 +67,9 @@ class DataPerCPerY{
     }
 
     setData(dataType,rank,data){
-        this.dataList[dataType].rank=parseInt(rank);
+        const r=parseInt(rank);
+        this.dataList[dataType].rank=parseInt(r);
+        this.rank=r;
         this.dataList[dataType].data=parseFloat(data);
     }
 
@@ -130,17 +132,18 @@ export default class DataStorage{
     async init(){
         //open the English-Chinese Country map for search.
         this.dictionary=await fetchCsvData(`/${CountryTransName}.csv`);
-        
+        const GDP=await fetchCsvData(`${FolderName[DataTypeEnum.GDP]}.csv`);
         for(let year=this.startYear;year<=this.endYear;year++){
             let dataPerY=[];
             //open data csv of different year.
             for(let typeKey in DataTypeEnum){
+                if(typeKey===DataTypeEnum.GDP || typeKey===DataTypeEnum.Enroll) continue;
                 const dataType=DataTypeEnum[typeKey];
-                const CSV=await fetchCsvData(`/${FolderName[dataType]}/${year}.csv`);
+                const CSV=await fetchCsvData(`${FolderName[dataType]}/${year}.csv`);
                 for(let oneSeg of CSV){
                     if(oneSeg.data===undefined) continue;
                     //if DataPerCPerY of this country exists,set new data on it, else create new one.
-                    const index=dataPerY.findIndex((value)=>{return (value.getCountry()===oneSeg.country)});
+                    let index=dataPerY.findIndex((value)=>{return (value.getCountry()===oneSeg.country)});
                     if(index===-1){
                         //get TransLatePackage used to link more data about one country.
                         let translation=this.getCountryPackage(oneSeg.country);
@@ -149,18 +152,43 @@ export default class DataStorage{
                         let curPiece=new DataPerCPerY(oneSeg.country,translation.Chinese,year);
                         curPiece.setData(dataType, oneSeg.rank , oneSeg.data);
                         dataPerY.push(curPiece);
+                        index=dataPerY.length-1;
                     }else dataPerY[index].setData(dataType,oneSeg.rank,oneSeg.data);
+                    //set data of education expense of gdp.
+                    if(year>=2012 && year<=2020){
+                        const gdpIndex=GDP.findIndex((value)=>{return (value.Chinese===dataPerY[index].name);});
+                        if(gdpIndex!==-1){
+                            dataPerY[index].setData(DataTypeEnum.GDP,
+                                GDP[gdpIndex][year.toString()+"Rank"],
+                                parseFloat(GDP[gdpIndex][year]).toFixed(2));
+                        }
+                    }
                 }
             }
+            
+            //find year agian to join country that have no university data.
+            for(let oneCountry of GDP){
+                const uniIndex=dataPerY.findIndex((value)=>{return (value.name===oneCountry.Chinese)});
+                if(uniIndex!==-1) continue;
+                const translation=this.getCountryPackage(oneCountry.Chinese,true);
+                if(translation===null) continue;
+                let curPiece=new DataPerCPerY(translation.English,oneCountry.Chinese,year);
+                curPiece.setData(DataTypeEnum.GDP,
+                    oneCountry[year.toString()+"Rank"],
+                    parseFloat(oneCountry[year]).toFixed(2));
+                dataPerY.push(curPiece);
+            }
+
             this.allData[year]=dataPerY;
         }
         //uncapture the change of DataStorage, call APP to setState and update.
         this.renewDataSet(this);
     }
 
-    getCountryPackage=(english)=>{
+    getCountryPackage=(name,isChinese=false)=>{
         for(let one of this.dictionary){
-            if(one.English===english){
+            if(((isChinese) 
+                ? one.Chinese===name:one.English===name)){
                 return one;
             }
         }

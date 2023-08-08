@@ -101,7 +101,8 @@ export default class WorldMap extends React.Component {
 
 
     getVisualMapMax(max){
-        if(max<100) return 100;
+        if(max<=18) return 10;
+        if(max>18 && max<100) return 100;
         if(max>=100 && max<300) return 300;
         else return 1000;
     }
@@ -126,7 +127,7 @@ export default class WorldMap extends React.Component {
         }
         //调整最大值为向上进位
         this.mapOptions.visualMap.max=this.getVisualMapMax(
-            parseFloat(this.mapOptions.series[0].data[0].value)+2
+            parseFloat(this.mapOptions.series[0].data[0].value)
         );
         
         this.myMap.setOption(this.mapOptions, false, false)

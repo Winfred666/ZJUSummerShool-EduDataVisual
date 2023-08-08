@@ -64,6 +64,10 @@ export default class App extends Component{
                 dataSet.startYear=2012;
                 dataSet.endYear=2023;
                 break;
+            case DataTypeEnum.GDP:
+                dataSet.startYear=2012;
+                dataSet.endYear=2020;
+                break;
             default:
                 dataSet.startYear=2012;
                 dataSet.endYear=2022;

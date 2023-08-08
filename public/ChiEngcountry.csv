@@ -3,7 +3,7 @@ Chinese,English,centerX,centerY
 阿尔及利亚,Algeria,2.8,29.7
 阿富汗,Afghanistan,67.5,35
 阿根廷,Argentina,-65.6,-39.5
-阿拉伯联合酋长国,"United,Arab,Emirates",,
+阿拉伯联合酋长国,"United,Arab,Emirates",38.5,28
 阿鲁巴,Aruba,-70,12.5
 阿曼,Oman,56.3,21.8
 阿塞拜疆,Azerbaijan,46.8,40.2
@@ -64,7 +64,7 @@ Chinese,English,centerX,centerY
 芬兰,Finland,25.9,65.2
 佛得角,"Cape,Verde",-23.9,16.1
 冈比亚,Gambia,-15.7,13.4
-刚果,Congo,,
+刚果,Congo,23.2,-5.2
 刚果（金）,"Congo,(Congo-Kinshasa)",23.2,-5.2
 哥伦比亚,Colombia,-73.1,4.6
 哥斯达黎加,"Costa,Rica",-84.2,9.7
@@ -121,7 +121,7 @@ Chinese,English,centerX,centerY
 马来西亚,Malaysia,110.2,4.2
 马里,Mali,-5.8,14.4
 马其顿,Macedonia,,
-"马绍尔,群岛","Marshall,Islands",,
+马绍尔群岛,"Marshall,Islands",,
 "马提尼克,岛",Martinique,,
 马约特,Mayotte,,
 毛里求斯,Mauritius,57.6,-20.3
