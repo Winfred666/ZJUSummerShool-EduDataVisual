@@ -20,6 +20,17 @@ export default class AllYearsGDPChart extends React.Component {
       axisPointer: { type: 'cross' }
     },
     legend: {},
+    title: {
+      left: 40,
+      bottom: 15,
+      text: '国家各年GDP与优质高校资源变化图',
+      textStyle: {
+        color: "rgba(144, 70, 70, 1)",
+        fontSize: 16,
+        fontWeight: "normal",
+        fontFamily: "Arial"
+      }
+    },
     xAxis: [
       {
         type: 'category',
@@ -76,29 +87,29 @@ export default class AllYearsGDPChart extends React.Component {
 
     const container = document.getElementById("AllYearsGDPChart")
     this.myMap = echarts.init(container)
-    this.myMap.setOption(this.mapOptions,true)
+    this.myMap.setOption(this.mapOptions, true)
   }
 
   componentDidUpdate () {
     const countryData = this.props.getDataByCountry()
-    if(countryData===null){
-      return;
+    if (countryData === null) {
+      return
     }
     for (let q = 2012; q <= 2022; q++) {
-      if(countryData[q]===null|| countryData[q]===undefined || countryData[q].dataList===null){
-        this.allYearGoodUniData[q-2012]=0;
-        this.allYearGDPData[q-2012]=0;
-      }else{
-        this.allYearGoodUniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data;
-        this.allYearGDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data;
+      if (countryData[q] === null || countryData[q] === undefined || countryData[q].dataList === null) {
+        this.allYearGoodUniData[q - 2012] = 0
+        this.allYearGDPData[q - 2012] = 0
+      } else {
+        this.allYearGoodUniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data
+        this.allYearGDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data
       }
     }
 
-    this.myMap.setOption(this.mapOptions,true)
+    this.myMap.setOption(this.mapOptions, true)
   }
 
-  getStyleClass=()=>{
-    return "hoverChart hoverTopLeftChart"+((this.props.shouldDisplay())?" hoverChartActive":"");
+  getStyleClass = () => {
+    return "hoverChart hoverTopLeftChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
   }
   render () {
     return (<div className={this.getStyleClass()} id="AllYearsGDPChart">
