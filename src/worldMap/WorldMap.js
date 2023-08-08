@@ -2,9 +2,9 @@ import React from "react"
 import * as echarts from 'echarts'
 import { MapChart } from "echarts/charts"
 import worldGeo from "@surbowl/world-geo-json-zh"
-import AllYearsUniChart from "./AllYearsUniChart"
-import AllYearsGDPChart from "./AllYearsGDPChart"
 import { FaultRank } from "../dataSelectTab/dataStorage"
+import UniDataChart from "./UniDataChart"
+import CountryRadarChart from "./CountryRadarChart"
 
 
 
@@ -23,18 +23,18 @@ export default class WorldMap extends React.Component {
     countryData = null;
 
     //地图是否在加载
-    isLoading=false;
+    isLoading = false;
 
     //存储地图状态，非受控组件
     mapOptions = {
         backgroundColor: '#f7fcff',
-        animation:true,
+        animation: true,
         visualMap: {
             text: ['High', 'Low'],
             realtime: true,
             calculable: true,
-            min:0,
-            max:200,
+            min: 0,
+            max: 200,
             inRange: {
                 color: ['lightskyblue', 'yellow', 'orangered']
             }
@@ -44,7 +44,7 @@ export default class WorldMap extends React.Component {
             formatter: (params) => {
                 if (params.data !== undefined) {
                     return `国家:${params.name} <br />英文:${params.data.country} <br />
-                    第${params.data.rank}名`;
+                    第${params.data.rank}名`
                 }
                 return `${params.name} <br /> 未上榜`
             }
@@ -82,16 +82,16 @@ export default class WorldMap extends React.Component {
         const MapContainer = document.getElementById("worldMapCore")
         this.myMap = echarts.init(MapContainer)
         echarts.registerMap(mapName, worldGeo)
-        const dataSource=this.props.getDataSource();
-        this.mapOptions.series[0].data = dataSource;
-        this.myMap.setOption(this.mapOptions, false, false);
+        const dataSource = this.props.getDataSource()
+        this.mapOptions.series[0].data = dataSource
+        this.myMap.setOption(this.mapOptions, false, false)
 
         //显示加载动画
-        if(dataSource===null||dataSource.length===0){
+        if (dataSource === null || dataSource.length === 0) {
             this.myMap.showLoading({
-                text:"正在加载地图",
-            });
-            this.isLoading=true;
+                text: "正在加载地图",
+            })
+            this.isLoading = true
         }
 
         //添加窗口调整、点击的侦听器
@@ -109,21 +109,21 @@ export default class WorldMap extends React.Component {
 
     componentDidUpdate () {
         //获取当年数据
-        this.mapOptions.series[0].data = this.props.getDataSource();
+        this.mapOptions.series[0].data = this.props.getDataSource()
         //在数据未完善时挂上loading，取消更新
-        if(this.mapOptions.series[0].data[0]===undefined||
-            this.mapOptions.series[0].data[0].rank===FaultRank){
+        if (this.mapOptions.series[0].data[0] === undefined ||
+            this.mapOptions.series[0].data[0].rank === FaultRank) {
             this.myMap.showLoading({
-                text:"正在加载地图",
-            });
-            this.isLoading=true;
-            return;
+                text: "正在加载地图",
+            })
+            this.isLoading = true
+            return
         }
-        
+
         //判断取消loading
-        if(this.isLoading){
-            this.myMap.hideLoading();
-            this.isLoading=false;
+        if (this.isLoading) {
+            this.myMap.hideLoading()
+            this.isLoading = false
         }
         //调整最大值为向上进位
         this.mapOptions.visualMap.max=this.getVisualMapMax(
@@ -192,10 +192,11 @@ export default class WorldMap extends React.Component {
             }}>
                 世界主要国家
             </div>
-            <AllYearsUniChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
-            </AllYearsUniChart>
-            <AllYearsGDPChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
-            </AllYearsGDPChart>
+
+            <UniDataChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
+            </UniDataChart>
+            <CountryRadarChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
+            </CountryRadarChart>
         </div>)
     }
 }
