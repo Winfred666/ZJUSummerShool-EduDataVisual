@@ -91,7 +91,9 @@ export default class App extends Component{
 
                     <TimeLine  startYear={this.state.dataSet.startYear} onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}></TimeLine>
                     <DataSelectTab onTypeChange={this.setDataType} onPercentChange={this.setDisplayTop}></DataSelectTab>
-                    <RankBoard getDataSource={this.getCurYearData} setSelectCountry={this.setSelectCountry}></RankBoard>
+                    <RankBoard getDataSource={this.getCurYearData} 
+                    setSelectCountry={this.setSelectCountry}
+                    selectCountry={this.state.selectCountry}></RankBoard>
                  </ConfigProvider>
             </div>
         );

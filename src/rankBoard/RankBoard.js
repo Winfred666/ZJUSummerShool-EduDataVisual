@@ -19,28 +19,6 @@ function getIconClass(index){
             break;
     }
     return ret;
-    /*const BGC="backgroundColor";
-    const C="color"
-    ret["fontSize"]="15px";
-    ret["fontWeight"]="bold";
-    switch(index){
-        case 1:
-            ret[C]="#ff5200";
-            ret[BGC]="#fde3cf";
-            break;
-        case 2:
-            ret[C]="#ff8d00";
-            ret[BGC]="#FDF1CF";
-            break;
-        case 3:
-            ret[C]="#e6ca00";
-            ret[BGC]="#FFFDD7";
-            break;
-        default:
-            ret[C]="#919191";
-            ret[BGC]="#FFFFFF";
-            break;
-    }*/
 }
 
 
@@ -69,31 +47,70 @@ export default class RankBoard extends React.Component{
     state={
         selectIndex:-1,
     }
-    
+    dataSource=null;
+
     getTableData=()=>{
         const ret=this.props.getDataSource();
-        /* //fake data
-        const ret=[];
-        for(let q=1;q<100;q++){
-            ret.push({
-                key:q,
-                rank:q,
-                country:`Country ${q}`,
-                value:999-q,
-            });
-        }*/
+        this.dataSource=ret;
         return ret;
     }
 
+    //positively select record
     onSelect=(record,index)=>{
         const lastSelected=this.state.selectIndex;
-        if(lastSelected===index){
-            index=-1;
-        }
-        this.setState({selectIndex:index});
         console.log(record);
-        this.props.setSelectCountry(record.country);
+        if(lastSelected===index){
+            this.props.setSelectCountry(null);
+        }else{
+            this.props.setSelectCountry(record.country);
+        }
     }
+
+    getIndexByCountry=(country)=>{
+        let index=-1;
+        if(country===null) return index;
+        //find the record of select country.
+        const recordSet=this.dataSource;
+        const recordSetLen=recordSet.length;
+        for(let q=0;q<recordSetLen;q++){
+            if(!recordSet[q]) continue;
+            if(recordSet[q].country===country){
+                //index equals to key-1, key equals to rank.
+                index=recordSet[q].key-1;
+                break;
+            }
+        }
+        return index;
+    }
+
+    //set state when select country change.
+    scrollToIndex=(index)=>{
+        //not found, can't scroll to there.
+        if(index===-1) return;
+        //scroll to that country.
+        const box=document.getElementById("rankAntTable");
+        const v=box.getElementsByClassName("ant-table-body")[0];
+        const oriScrollTop=v.scrollTop;
+        const destScrollTop=v.scrollHeight*(index/this.dataSource.length);
+        const totalStep=15;
+        let nowStep=0;
+        let inter=setInterval(()=>{
+            nowStep++;
+            const toDest=1-nowStep/totalStep;
+            v.scrollTop=oriScrollTop+(destScrollTop-oriScrollTop)*(1-toDest*toDest*toDest);
+            if(nowStep>=totalStep) clearInterval(inter);
+        },50);
+    }
+
+    //passitive or positive change will make table scroll.
+    componentDidUpdate(){
+        const newIndex=this.getIndexByCountry(this.props.selectCountry);
+        if(newIndex!==this.state.selectIndex){
+            this.scrollToIndex(newIndex);
+            this.setState({selectIndex:newIndex});
+        }
+    }
+    
 
     selectBox=()=>{
         //checked: whether the box is selected
@@ -113,10 +130,10 @@ export default class RankBoard extends React.Component{
         return (
             <div className="rankBoard">
                 <div className="normalTitle" style={{borderBottom:"2px solid rgb(146, 207, 216)"}}>排行榜</div>
-                <Table columns={TableColumn} 
+                <Table id="rankAntTable"
+                columns={TableColumn} 
                 dataSource={this.getTableData()}
                 pagination={false}
-                
                 rowClassName={this.getRowClassName}
                 onRow={(record,index)=>{
                     return{

@@ -21,7 +21,7 @@ async function fetchCsvData(filePath) {
 }
 
 
-const FaultRank=300;
+export const FaultRank=300;
 
 //数据的最小形式
 const Unitdata={
@@ -67,8 +67,8 @@ class DataPerCPerY{
     }
 
     setData(dataType,rank,data){
-        this.dataList[dataType].rank=rank;
-        this.dataList[dataType].data=data;
+        this.dataList[dataType].rank=parseInt(rank);
+        this.dataList[dataType].data=parseFloat(data);
     }
 
     getData(dataType){
@@ -137,9 +137,6 @@ export default class DataStorage{
             for(let typeKey in DataTypeEnum){
                 const dataType=DataTypeEnum[typeKey];
                 const CSV=await fetchCsvData(`/${FolderName[dataType]}/${year}.csv`);
-                if(year===2023){
-                    console.log(CSV);
-                }
                 for(let oneSeg of CSV){
                     if(oneSeg.data===undefined) continue;
                     //if DataPerCPerY of this country exists,set new data on it, else create new one.
@@ -150,7 +147,7 @@ export default class DataStorage{
                         //do not have translation, discard this country.
                         if(translation===undefined || translation===null) continue;
                         let curPiece=new DataPerCPerY(oneSeg.country,translation.Chinese,year);
-                        curPiece.setData(dataType,oneSeg.rank,oneSeg.data);
+                        curPiece.setData(dataType, oneSeg.rank , oneSeg.data);
                         dataPerY.push(curPiece);
                     }else dataPerY[index].setData(dataType,oneSeg.rank,oneSeg.data);
                 }
@@ -176,26 +173,38 @@ export default class DataStorage{
         //wait the render of allData.
         if(this.allData[year]===undefined) return [];
 
+        let sameRankNum=new Map();
+        function addRankNum(rank){
+            let num=sameRankNum.get(rank);
+            if(num===undefined) num=0;
+            else num++;
+            sameRankNum.set(rank,num);
+            return num;
+        }
+
         //if rankedData has been generated
         if(this.rankedData[year]!==undefined && this.rankedData[year][dataType]!==undefined){
             const ranked=this.rankedData[year][dataType];
-            //renew value and rank of this dataType
+            //renew value ,rank and key of this dataType
             for(let one of ranked){
-                if(!one) break;
+                if(!one) continue;
                 const piece=one.getData(dataType);
                 one.value=piece.data;
+                const num=addRankNum(piece.rank);
                 one.rank=piece.rank;
+                one.key=parseInt(piece.rank)+num;
             }
             return this.rankedData[year][dataType];
         }
 
+        //if rankedData of this year wasn't been generate.
         if(this.rankedData[year]===undefined){
             this.rankedData[year]=[];
         }
         const dataListInOrder=[];
         //one:DataPerCPerY
         const dataPerY=this.allData[year];
-        let curKey=1;
+        
         for(let one of dataPerY){
             //piece:DataUnit
             const piece=one.getData(dataType);
@@ -204,9 +213,10 @@ export default class DataStorage{
             //anyway, follow the principle not change the source data, no error occured:)
             //all we need: value=data in dataList, rank=rank in dataList.
             if(piece.rank===FaultRank) continue;
+            const num=addRankNum(piece.rank);
             one.value=piece.data;
             one.rank=piece.rank;
-            one.key=curKey++;
+            one.key=parseInt(piece.rank)+num;
             dataListInOrder[one.key-1]=one;
         }
         this.rankedData[year][dataType]=dataListInOrder;
