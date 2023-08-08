@@ -8,27 +8,45 @@ import { DataTypeEnum } from "../dataSelectTab/dataStorage"
 
 echarts.use([GridComponent, LineChart, CanvasRenderer, UniversalTransition])
 
-export default class AllYearsGDPChart extends React.Component {
+export default class UniDataChart extends React.Component {
   myMap = null;
 
-  allYearGDPData = [];
-  allYearGoodUniData = [];
+  top1000UniData = [];
+  top100UniData = [];
 
   mapOptions = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' }
-    },
-    legend: {},
     title: {
-      left: 40,
+      left: 80,
       bottom: 15,
-      text: '国家各年GDP与优质高校资源变化图',
+      text: '国家优秀大学数目变化图',
       textStyle: {
         color: "rgba(144, 70, 70, 1)",
         fontSize: 16,
         fontWeight: "normal",
         fontFamily: "Arial"
+      }
+    },
+    legend: {
+      data: ['top100大学', 'top1000大学'],
+      right: 0
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      }
+    },
+    toolbox: {
+      show: true,
+      orient: 'horizontal',
+      left: 0,
+      top: 0,
+      feature: {
+        mark: { show: true },
+        dataView: { show: true, readOnly: false },
+        magicType: { show: true, type: ['line', 'bar'] },
+        restore: { show: true },
+        saveAsImage: { show: true }
       }
     },
     xAxis: [
@@ -55,37 +73,43 @@ export default class AllYearsGDPChart extends React.Component {
     yAxis: [
       {
         type: 'value',
-        name: '上榜大学数',
+        name: 'top100大学',
         min: 0,
         position: 'right',
       },
       {
         type: 'value',
-        name: 'GDP',
+        name: 'top1000大学',
         min: 0,
         position: 'left',
       }
     ],
     series: [
       {
-        name: '上榜大学数',
+        name: 'top100大学',
         type: 'line',
+        barGap: 0,
         yAxisIndex: 0,
-        data: this.allYearGoodUniData,
+        emphasis: {
+          focus: 'series'
+        },
+        data: this.top100UniData,
       },
       {
-        name: 'GDP',
+        name: 'top1000大学',
         type: 'line',
-        smooth: true,
         yAxisIndex: 1,
-        data: this.allYearGDPData,
+        emphasis: {
+          focus: 'series'
+        },
+        data: this.top1000UniData,
       }
     ]
   };
 
   componentDidMount () {
 
-    const container = document.getElementById("AllYearsGDPChart")
+    const container = document.getElementById("UniDataChart")
     this.myMap = echarts.init(container)
     this.myMap.setOption(this.mapOptions, true)
   }
@@ -97,11 +121,11 @@ export default class AllYearsGDPChart extends React.Component {
     }
     for (let q = 2012; q <= 2022; q++) {
       if (countryData[q] === null || countryData[q] === undefined || countryData[q].dataList === null) {
-        this.allYearGoodUniData[q - 2012] = 0
-        this.allYearGDPData[q - 2012] = 0
+        this.top100UniData[q - 2012] = 0
+        this.top1000UniData[q - 2012] = 0
       } else {
-        this.allYearGoodUniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data
-        this.allYearGDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data
+        this.top100UniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data
+        this.top1000UniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni1k].data
       }
     }
 
@@ -112,7 +136,7 @@ export default class AllYearsGDPChart extends React.Component {
     return "hoverChart hoverTopLeftChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
   }
   render () {
-    return (<div className={this.getStyleClass()} id="AllYearsGDPChart">
+    return (<div className={this.getStyleClass()} id="UniDataChart">
     </div>)
   }
 }

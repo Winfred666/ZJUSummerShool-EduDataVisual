@@ -3,7 +3,7 @@ import * as echarts from 'echarts'
 import { MapChart } from "echarts/charts"
 import worldGeo from "@surbowl/world-geo-json-zh"
 import { FaultRank } from "../dataSelectTab/dataStorage"
-import AllYearsGDPChart from "./AllYearsGDPChart"
+import UniDataChart from "./UniDataChart"
 import CountryRadarChart from "./CountryRadarChart"
 
 
@@ -192,8 +192,8 @@ export default class WorldMap extends React.Component {
                 世界主要国家
             </div>
 
-            <AllYearsGDPChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
-            </AllYearsGDPChart>
+            <UniDataChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
+            </UniDataChart>
             <CountryRadarChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
             </CountryRadarChart>
         </div>)
