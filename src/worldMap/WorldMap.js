@@ -43,7 +43,7 @@ export default class WorldMap extends React.Component {
             trigger: 'item',
             formatter: (params) => {
                 if (params.data !== undefined) {
-                    return `国家:${params.name} <br />英文:${params.data.country} <br />
+                    return `国家:${params.name} <br />编码:${params.data.country} <br />
                     第${params.data.rank}名`
                 }
                 return `${params.name} <br /> 未上榜`
@@ -190,7 +190,7 @@ export default class WorldMap extends React.Component {
                 transform: "translate(-50%, 0)",
                 PointerEvent: "none"
             }}>
-                世界主要国家
+                {this.props.mapTitle}
             </div>
 
             <UniDataChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>

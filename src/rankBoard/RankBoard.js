@@ -128,8 +128,9 @@ export default class RankBoard extends React.Component{
 
     render(){
         return (
+            <>
+            <div className="normalTitle rankBoardTitle" style={{borderBottom:"2px solid rgb(146, 207, 216)"}}>排行榜</div>
             <div className="rankBoard">
-                <div className="normalTitle" style={{borderBottom:"2px solid rgb(146, 207, 216)"}}>排行榜</div>
                 <Table id="rankAntTable"
                 columns={TableColumn} 
                 dataSource={this.getTableData()}
@@ -147,6 +148,7 @@ export default class RankBoard extends React.Component{
                     y: 300,
                 }}/>
             </div>
+            </>
         );
     }
 }

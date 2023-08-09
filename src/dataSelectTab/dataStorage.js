@@ -37,16 +37,25 @@ export const DataTypeEnum=Object.freeze({
     GoodUni1k:3
 });
 
-//数据标识字符
-const FolderName=Object.freeze({
-    0:"/TopUniversity",
-    1:"/EduExpenseOfGDP",
-    2:"/EnrollRate",
-    3:"/Top1000University",
-});
+//数据表名称
+const FileName=Object.freeze([
+    "Top100University",
+    "EduExpenseOfGDP",
+    "EnrollRate",
+    "Top1000University",
+]);
+
+//开始时间和结束时间
+export const BoundaryYear=Object.freeze([
+    {startYear:2012,endYear:2023},
+    {startYear:2012,endYear:2020},
+    {startYear:2012,endYear:2020},
+    {startYear:2014,endYear:2023},
+]);
 
 //一个国家，一个时间点的数据
 class DataPerCPerY{
+    //country, now equals to Country Code.
     country="";
     year=2012;
 
@@ -70,6 +79,8 @@ class DataPerCPerY{
         const r=parseInt(rank);
         this.dataList[dataType].rank=parseInt(r);
         this.rank=r;
+        if(typeof data === "string") data=parseFloat(data);
+        data=data.toFixed(2);
         this.dataList[dataType].data=parseFloat(data);
     }
 
@@ -130,65 +141,37 @@ export default class DataStorage{
     rankedData={};
 
     async init(){
-        //open the English-Chinese Country map for search.
+        //open the English-Chinese Dictionary for search.
         this.dictionary=await fetchCsvData(`/${CountryTransName}.csv`);
-        const GDP=await fetchCsvData(`${FolderName[DataTypeEnum.GDP]}.csv`);
-        for(let year=this.startYear;year<=this.endYear;year++){
-            let dataPerY=[];
-            //open data csv of different year.
-            for(let typeKey in DataTypeEnum){
-                if(typeKey===DataTypeEnum.GDP || typeKey===DataTypeEnum.Enroll) continue;
-                const dataType=DataTypeEnum[typeKey];
-                const CSV=await fetchCsvData(`${FolderName[dataType]}/${year}.csv`);
-                for(let oneSeg of CSV){
-                    if(oneSeg.data===undefined) continue;
-                    //if DataPerCPerY of this country exists,set new data on it, else create new one.
-                    let index=dataPerY.findIndex((value)=>{return (value.getCountry()===oneSeg.country)});
+        
+        for(let ty=0;ty<FileName.length;ty++){
+            const CSV=await fetchCsvData("/"+FileName[ty]+".csv");
+            for(let country of CSV){
+                const bound=BoundaryYear[ty];
+                for(let year=bound.startYear;year<=bound.endYear;year++){
+                    //do not have dataset of specifit year, create one.
+                    if(this.allData[year]===undefined) this.allData[year]=[];
+                    const index=this.allData[year].findIndex((value)=>{return (value.country===country.Code);});
+                    //do not have data piece of that country in specifit year,create one.
                     if(index===-1){
-                        //get TransLatePackage used to link more data about one country.
-                        let translation=this.getCountryPackage(oneSeg.country);
-                        //do not have translation, discard this country.
-                        if(translation===undefined || translation===null) continue;
-                        let curPiece=new DataPerCPerY(oneSeg.country,translation.Chinese,year);
-                        curPiece.setData(dataType, oneSeg.rank , oneSeg.data);
-                        dataPerY.push(curPiece);
-                        index=dataPerY.length-1;
-                    }else dataPerY[index].setData(dataType,oneSeg.rank,oneSeg.data);
-                    //set data of education expense of gdp.
-                    if(year>=2012 && year<=2020){
-                        const gdpIndex=GDP.findIndex((value)=>{return (value.Chinese===dataPerY[index].name);});
-                        if(gdpIndex!==-1){
-                            dataPerY[index].setData(DataTypeEnum.GDP,
-                                GDP[gdpIndex][year.toString()+"Rank"],
-                                parseFloat(GDP[gdpIndex][year]).toFixed(2));
-                        }
+                        const translation=this.getCountryPackage(country.Code);
+                        if(translation === null) continue;
+                        const curPiece=new DataPerCPerY(country.Code,translation.Chinese,year);
+                        curPiece.setData(ty,country[year.toString()+"Rank"],country[year]);
+                        this.allData[year].push(curPiece);
+                    }else{
+                        this.allData[year][index].setData(ty,country[year.toString()+"Rank"],country[year]);
                     }
                 }
             }
-            
-            //find year agian to join country that have no university data.
-            for(let oneCountry of GDP){
-                const uniIndex=dataPerY.findIndex((value)=>{return (value.name===oneCountry.Chinese)});
-                if(uniIndex!==-1) continue;
-                const translation=this.getCountryPackage(oneCountry.Chinese,true);
-                if(translation===null) continue;
-                let curPiece=new DataPerCPerY(translation.English,oneCountry.Chinese,year);
-                curPiece.setData(DataTypeEnum.GDP,
-                    oneCountry[year.toString()+"Rank"],
-                    parseFloat(oneCountry[year]).toFixed(2));
-                dataPerY.push(curPiece);
-            }
-
-            this.allData[year]=dataPerY;
         }
         //uncapture the change of DataStorage, call APP to setState and update.
         this.renewDataSet(this);
     }
 
-    getCountryPackage=(name,isChinese=false)=>{
+    getCountryPackage=(code)=>{
         for(let one of this.dictionary){
-            if(((isChinese) 
-                ? one.Chinese===name:one.English===name)){
+            if(one.Code===code){
                 return one;
             }
         }

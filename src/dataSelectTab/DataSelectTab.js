@@ -1,4 +1,4 @@
-import {Button, Select } from "antd";
+import {Select } from "antd";
 import React from "react";
 import { DataTypeEnum } from "./dataStorage";
 
@@ -13,7 +13,7 @@ const dataType=[{
 },
 {
     value:DataTypeEnum.GDP,
-    label:(<div className="normalText">GDP</div>),
+    label:(<div className="normalText">教育支出占GDP比率</div>),
 },{
     value:DataTypeEnum.Enroll,
     label:(<div className="normalText">入学率</div>),
