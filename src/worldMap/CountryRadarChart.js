@@ -18,7 +18,7 @@ function conversion (rank) {
 export default class CountryRadarChart extends React.Component {
   myMap = null;
 
-  countryData = [0, 0, 0, 18000, 18000];
+  countryData = [0, 0, 0, 0, 18000, 18000];
 
   mapOptions = {
     title: {
@@ -44,11 +44,12 @@ export default class CountryRadarChart extends React.Component {
     },
     radar: {
       indicator: [
+        { name: 'GDP', max: 250000 },
         { name: 'top100大学', max: 1 },
         { name: 'top1000大学', max: 1 },
         { name: '人均教育支出(%)', max: 15 },
-        { name: '中学入学率(%)', max: 52000 },
-        { name: '大学入学率(%)', max: 52000 }
+        { name: '中学入学率(%)', max: 120 },
+        { name: '大学入学率(%)', max: 120 }
       ],
       axisName: {
         color: "rgba(27, 26, 26, 1)"
@@ -82,11 +83,12 @@ export default class CountryRadarChart extends React.Component {
       this.countryData[1] = 0
       this.countryData[2] = 0
     } else {
-      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GoodUni].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni].rank)
-      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank)
-      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GDP].data > 15 ? 15 : countryData[2020].dataList[DataTypeEnum.GDP].data
-      //this.countryData[3] = countryData[2020].dataList[DataTypeEnum.Enroll].data
-      //this.countryData[4] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].data
+      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GDP].data
+      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni].rank)
+      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank)
+      this.countryData[3] = countryData[2020].dataList[DataTypeEnum.EduOfGDP].data > 15 ? 15 : countryData[2020].dataList[DataTypeEnum.EduOfGDP].data
+      this.countryData[4] = countryData[2020].dataList[DataTypeEnum.MiddleEnroll].data
+      this.countryData[5] = countryData[2020].dataList[DataTypeEnum.CollegeEnroll].data
     }
 
     this.myMap.setOption(this.mapOptions, true)
