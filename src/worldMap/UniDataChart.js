@@ -34,6 +34,9 @@ export default class UniDataChart extends React.Component {
       trigger: 'axis',
       axisPointer: {
         type: 'cross'
+      },
+      textStyle: {
+        align: 'left'
       }
     },
     toolbox: {

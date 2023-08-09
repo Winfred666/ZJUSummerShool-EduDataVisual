@@ -5,19 +5,26 @@ import { RadarChart } from 'echarts/charts'
 import { CanvasRenderer } from 'echarts/renderers'
 import { DataTypeEnum } from "../dataSelectTab/dataStorage"
 
-
 echarts.use([TitleComponent, LegendComponent, RadarChart, CanvasRenderer])
+
+function round (number, precision) {
+  return Math.round(+number + "e" + precision) / Math.pow(10, precision)
+}
+
+function conversion (rank) {
+  return round((65 - rank) / 65, 3)
+}
 
 export default class CountryRadarChart extends React.Component {
   myMap = null;
 
-  countryData = [0, 0, 0, 35000, 0, 18000];
+  countryData = [0, 0, 0, 18000, 18000];
 
   mapOptions = {
     title: {
-      left: 10,
-      top: 0,
-      text: '国家经济教育状况',
+      left: -6,
+      top: 13,
+      text: '2020国家经济教育状况',
       textStyle: {
         color: "rgba(144, 70, 70, 1)",
         fontSize: 16,
@@ -25,18 +32,23 @@ export default class CountryRadarChart extends React.Component {
         fontFamily: "Arial"
       }
     },
-    tooltip: {},
+    tooltip: {
+      trigger: 'item',
+      position: [230, 10],
+      textStyle: {
+        align: 'left'
+      }
+    },
     legend: {
       data: ['country data']
     },
     radar: {
       indicator: [
-        { name: 'GDP' },
-        { name: 'top100大学' },
-        { name: 'top1000大学' },
-        { name: '人均教育支出', max: 30000 },
-        { name: '入学率' },
-        { name: '毛入学率', max: 52000 }
+        { name: 'top100大学', max: 1 },
+        { name: 'top1000大学', max: 1 },
+        { name: '人均教育支出(%)', max: 15 },
+        { name: '中学入学率(%)', max: 52000 },
+        { name: '大学入学率(%)', max: 52000 }
       ],
       axisName: {
         color: "rgba(27, 26, 26, 1)"
@@ -70,10 +82,11 @@ export default class CountryRadarChart extends React.Component {
       this.countryData[1] = 0
       this.countryData[2] = 0
     } else {
-      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GDP].data
-      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni].data
-      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].data
-      this.countryData[4] = countryData[2020].dataList[DataTypeEnum.Enroll].data
+      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GoodUni].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni].rank)
+      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank)
+      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GDP].data > 15 ? 15 : countryData[2020].dataList[DataTypeEnum.GDP].data
+      //this.countryData[3] = countryData[2020].dataList[DataTypeEnum.Enroll].data
+      //this.countryData[4] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].data
     }
 
     this.myMap.setOption(this.mapOptions, true)

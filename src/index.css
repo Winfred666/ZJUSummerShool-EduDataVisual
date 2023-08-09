@@ -141,7 +141,7 @@ body {
 }
 
 .hoverRatarChart {
-  bottom: 0px;
+  bottom: -5px;
   left: 30px;
   width: 360px;
   height: 250px;
