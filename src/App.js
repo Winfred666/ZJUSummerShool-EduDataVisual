@@ -98,7 +98,8 @@ export default class App extends Component{
                     setSelectCountry={this.setSelectCountry}
                     selectCountry={this.state.selectCountry}
                     getCountryPackage={this.state.dataSet.getCountryPackage}
-                    mapTitle={this.state.mapTitle}></WorldMap>
+                    mapTitle={this.state.mapTitle}
+                    dataType={this.state.curDataType}></WorldMap>
 
                     <TimeLine startYear={this.state.dataSet.startYear} 
                     onYearChange={this.setCurYear} endYear={this.state.dataSet.endYear}
@@ -108,7 +109,8 @@ export default class App extends Component{
                     
                     <RankBoard getDataSource={this.getCurYearData} 
                     setSelectCountry={this.setSelectCountry}
-                    selectCountry={this.state.selectCountry}></RankBoard>
+                    selectCountry={this.state.selectCountry}
+                    dataType={this.state.curDataType}></RankBoard>
 
                  </ConfigProvider>
             </div>

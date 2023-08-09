@@ -1,5 +1,6 @@
 import {Avatar,Table} from "antd";
 import React from "react";
+import { TagAndUnitOfData } from "../dataSelectTab/dataStorage";
 
 
 function getIconClass(index){
@@ -37,7 +38,7 @@ const TableColumn=[
         dataIndex:"name",
     },
     {
-        title:"数据",
+        title:"数据(单位:所)",
         className:"normalText",
         dataIndex:"value",
     }
@@ -102,6 +103,7 @@ export default class RankBoard extends React.Component{
         },50);
     }
 
+    
     //passitive or positive change will make table scroll.
     componentDidUpdate(){
         const newIndex=this.getIndexByCountry(this.props.selectCountry);
@@ -127,6 +129,7 @@ export default class RankBoard extends React.Component{
     }
 
     render(){
+        TableColumn[2].title="数据/"+TagAndUnitOfData[this.props.dataType].unit;
         return (
             <>
             <div className="normalTitle rankBoardTitle" style={{borderBottom:"2px solid rgb(146, 207, 216)"}}>排行榜</div>

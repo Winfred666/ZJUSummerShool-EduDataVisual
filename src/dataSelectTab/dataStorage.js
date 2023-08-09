@@ -33,16 +33,20 @@ const Unitdata={
 export const DataTypeEnum=Object.freeze({
     GoodUni:0,
     GDP:1,
-    Enroll:2,
-    GoodUni1k:3
+    CollegeEnroll:2,
+    GoodUni1k:3,
+    MiddleEnroll:4,
+    EduOfGDP:5,
 });
 
 //数据表名称
 const FileName=Object.freeze([
     "Top100University",
     "EduExpenseOfGDP",
-    "EnrollRate",
+    "CollegeEnrollRate",
     "Top1000University",
+    "MiddleEnrollRate",
+    "GDP",
 ]);
 
 //开始时间和结束时间
@@ -51,6 +55,17 @@ export const BoundaryYear=Object.freeze([
     {startYear:2012,endYear:2020},
     {startYear:2012,endYear:2020},
     {startYear:2014,endYear:2023},
+    {startYear:2012,endYear:2020},
+    {startYear:2012,endYear:2020},
+]);
+//数据单位
+export const TagAndUnitOfData=Object.freeze([
+    {tag:"优质大学(前100)", unit:"所"},
+    {tag:"教育支出占GDP比重",unit:"%"},
+    {tag:"大学毛入学率",unit:"%"},
+    {tag:"优质大学(前1k)",unit:"所"},
+    {tag:"中学毛入学率",unit:"%"},
+    {tag:"GDP",unit:"亿美元"},
 ]);
 
 //一个国家，一个时间点的数据
@@ -71,6 +86,8 @@ class DataPerCPerY{
         this.year=year;
         this.dataList=[Object.create(Unitdata)
             ,Object.create(Unitdata),
+            Object.create(Unitdata),
+            Object.create(Unitdata),
             Object.create(Unitdata),
             Object.create(Unitdata)];
     }

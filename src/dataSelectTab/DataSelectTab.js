@@ -1,23 +1,15 @@
 import {Select } from "antd";
 import React from "react";
-import { DataTypeEnum } from "./dataStorage";
+import { DataTypeEnum, TagAndUnitOfData } from "./dataStorage";
 
 
-const dataType=[{
-    value:DataTypeEnum.GoodUni,
-    label:(<div className="normalText">优质大学资源(前100)</div>),
-},
-{
-    value:DataTypeEnum.GoodUni1k,
-    label:(<div className="normalText">优质大学资源(前1k)</div>),
-},
-{
-    value:DataTypeEnum.GDP,
-    label:(<div className="normalText">教育支出占GDP比率</div>),
-},{
-    value:DataTypeEnum.Enroll,
-    label:(<div className="normalText">入学率</div>),
-}];
+const dataTag=[];
+for(let type=0;type<TagAndUnitOfData.length;type++){
+    dataTag.push({
+        value:type,
+        label:(<div className="normalText">{TagAndUnitOfData[type].tag}</div>),
+    })
+}
 
 
 export default class DataSelectTab extends React.Component{
@@ -27,7 +19,7 @@ export default class DataSelectTab extends React.Component{
                  <Select className="normalText buttonBorder" size="large"
                   onChange={this.props.onTypeChange}
                   defaultValue={DataTypeEnum.GoodUni}
-                  options={dataType}/>
+                  options={dataTag}/>
             </div>
         )
     }

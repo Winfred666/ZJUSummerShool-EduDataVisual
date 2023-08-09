@@ -11,6 +11,7 @@ body {
   grid-template-rows: 50px minmax(500px, 4fr) 1fr;
   overflow-x: hidden;
   overflow-y: hidden;
+  border-top: 2px solid rgb(146, 207, 216);
   box-shadow: 0px 5px 4px 3px rgb(146, 207, 216);
   background-color: #f7fcffad;
 }
@@ -30,7 +31,7 @@ body {
 .timeLine {
   grid-row: 3;
   grid-column: 1;
-  border-top: 2px solid #f7fcff;
+  border-top: 2px solid rgb(146, 207, 216);
 
   text-align: center;
 }
@@ -165,6 +166,8 @@ body {
   border-left: 2px solid rgb(146, 207, 216);
   text-align: center;
   vertical-align: middle;
+  padding-top: 10px;
+  margin-top: 0px;
 }
 
 .ant-table-tbody > tr:hover:not(.ant-table-expanded-row) > td {

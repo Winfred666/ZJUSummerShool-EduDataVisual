@@ -2,7 +2,7 @@ import React from "react"
 import * as echarts from 'echarts'
 import { MapChart } from "echarts/charts"
 import worldGeo from "@surbowl/world-geo-json-zh"
-import { FaultRank } from "../dataSelectTab/dataStorage"
+import { FaultRank, TagAndUnitOfData } from "../dataSelectTab/dataStorage"
 import UniDataChart from "./UniDataChart"
 import CountryRadarChart from "./CountryRadarChart"
 
@@ -44,10 +44,16 @@ export default class WorldMap extends React.Component {
             formatter: (params) => {
                 if (params.data !== undefined) {
                     return `国家:${params.name} <br />编码:${params.data.country} <br />
+                    ${TagAndUnitOfData[this.props.dataType].tag}:${params.data.value}${TagAndUnitOfData[this.props.dataType].unit}
+                    <br />
                     第${params.data.rank}名`
                 }
                 return `${params.name} <br /> 未上榜`
-            }
+            },
+            textStyle:{
+
+                align:'left'
+            },
         },
         itemStyle: {
             normal: {
@@ -103,7 +109,9 @@ export default class WorldMap extends React.Component {
     getVisualMapMax(max){
         if(max<=18) return 10;
         if(max>18 && max<100) return 100;
-        if(max>=100 && max<300) return 300;
+        if(max>=100 && max<200) return 150;
+        if(max>200 && max<300) return 300;
+        if(max>100000) return 100000; 
         else return 1000;
     }
 
@@ -129,6 +137,9 @@ export default class WorldMap extends React.Component {
         this.mapOptions.visualMap.max=this.getVisualMapMax(
             parseFloat(this.mapOptions.series[0].data[0].value)
         );
+        //为GDP调整最小值
+        if(this.mapOptions.visualMap.max>10000) this.mapOptions.visualMap.min=1000;
+        else this.mapOptions.visualMap.min=0;
         
         this.myMap.setOption(this.mapOptions, false, false)
         //检测是否需要更新国家聚焦
