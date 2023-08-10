@@ -4,6 +4,8 @@ import { TooltipComponent, LegendComponent } from 'echarts/components';
 import { PieChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
+import { DataTypeEnum, TagAndUnitOfData } from "../dataSelectTab/dataStorage";
+import { getVisualMapMax } from "../worldMap/WorldMap";
 
 echarts.use([
   TooltipComponent,
@@ -13,12 +15,19 @@ echarts.use([
   LabelLayout
 ]);
 
+const ListOfFive=["美国","中国","俄罗斯","英国","法国"];
+const ChartTypeEnum=Object.freeze({
+  Pie:true,
+  Bar:false,
+});
+
 export default class SummaryPie extends React.Component {
   myMap = null;
-
+  curOptions=ChartTypeEnum.Pie;
+  lastDataType=DataTypeEnum.GoodUni;
   mapOptions = {
     title: {
-      text: '联合国五常数据汇总图',
+      text: '联合国五常数据概览',
       left: 'center',
       textStyle: {
         color: '#004c78',
@@ -31,8 +40,10 @@ export default class SummaryPie extends React.Component {
       trigger: 'item'
     },
     legend: {
-      top: '5%',
-      left: 'left'
+      orient:"horizontal",
+      bottom: 0,
+      itemGap: 8,
+      itemWidth:18,
     },
     series: [
       {
@@ -58,10 +69,63 @@ export default class SummaryPie extends React.Component {
         labelLine: {
           show: false
         },
-        data: []
+        data: [],
+        universalTransition:{
+          enabled:true,
+        }
       }
     ]
   };
+
+  barOptions={
+    xAxis: {
+      type: 'category',
+      data: ListOfFive,
+      axisLabel:{
+        show:true,
+        interval:0,
+      },
+      inverse: false,
+      animationDuration: 500,
+      animationDurationUpdate: 300,
+    },
+    grid:{
+      x:60,
+    },
+
+    tooltip: {
+      trigger: 'item',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    yAxis: {
+      type:"value",
+      nameTextStyle:{
+        color: '#004c78',
+        fontWeight: 'normal',
+        fontSize: 16,
+        height: 20,
+        align:"left",
+      }
+    },
+    series: [
+      {
+        realtimeSort: true,
+        type: 'bar',
+        id: 'total',
+        data: [],
+        universalTransition: {
+          enabled: true,
+        },
+      }
+    ],
+    animationDuration: 500,
+    animationDurationUpdate: 300,
+    animationEasing: 'backOut',
+    animationEasingUpdate: 'quintOut'
+  };
+
 
   componentDidMount () {
     const container = document.getElementById("SummaryPie");
@@ -73,13 +137,43 @@ export default class SummaryPie extends React.Component {
     const countryData = this.props.getDataByYear();
     let data =[];
     for(let one of countryData){
+      if(!one) continue;
       if(["CHN","USA","GBR","RUS","FRA"].includes(one.country)){
         data.push(one);
         if(data.length>=5) break;
       }
     }
-    this.mapOptions.series[0].data = data;
-    this.myMap.setOption(this.mapOptions,true)
+
+    let finalOptions=null;
+    if([DataTypeEnum.GoodUni,DataTypeEnum.GoodUni1k].includes(this.props.dataType)){
+      finalOptions=this.mapOptions;
+      finalOptions.series[0].data = data;
+      this.curOptions=ChartTypeEnum.Pie;
+      this.myMap.setOption(finalOptions,true)
+    }else{
+      finalOptions=this.barOptions;
+      finalOptions.yAxis.name=TagAndUnitOfData[this.props.dataType].tag+"/"+TagAndUnitOfData[this.props.dataType].unit;
+      if(this.props.dataType===DataTypeEnum.GDP) finalOptions.yAxis.max=210000;
+      else finalOptions.yAxis.max=getVisualMapMax(data[0].value);
+      //transform data source.
+      let tempArr=[];
+      for(let chi of ListOfFive){
+        const index=data.findIndex((piece)=>{return piece.name===chi});
+        if(index===-1) tempArr.push(0);
+        else tempArr.push(data[index].value);
+      }
+      finalOptions.series[0].data = tempArr;
+
+      //如果已经是柱状图并且是同一类数据，则部分更新数据，实现动态排名
+      if(this.curOptions===ChartTypeEnum.Bar && this.lastDataType===this.props.dataType)
+        this.myMap.setOption({
+          series:finalOptions.series
+        },false);
+      else
+        this.myMap.setOption(finalOptions,true);
+      this.curOptions=ChartTypeEnum.Bar;
+    }
+    this.lastDataType=this.props.dataType;
   }
 
   render () {

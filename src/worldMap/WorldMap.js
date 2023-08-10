@@ -11,7 +11,16 @@ import EnrollChart from "./EnrollChart"
 
 echarts.use([MapChart])
 
-const mapName = "world"
+const mapName = "world";
+
+export function getVisualMapMax (max){
+    if (max <= 18) return 10
+    if (max > 18 && max < 100) return 100
+    if (max >= 100 && max < 200) return 150
+    if (max > 200 && max < 300) return 300
+    if (max > 100000) return 100000
+    else return 1000
+}
 
 export default class WorldMap extends React.Component {
     //只用作本组件判断当前是否缩放，用于侦听改动。
@@ -29,7 +38,6 @@ export default class WorldMap extends React.Component {
     //存储地图状态，非受控组件
     mapOptions = {
         backgroundColor: '#f7fcff',
-        animation: true,
         visualMap: {
             text: ['High', 'Low'],
             realtime: true,
@@ -74,10 +82,12 @@ export default class WorldMap extends React.Component {
             map: mapName, //'world'
             mapType: "world",
             roam: false,
-            geoIndex: 1,
-            zoom: 1.1,  //地图的比例
+            zoom: 1.2,  //地图的比例
             label: {
                 show: false
+            },
+            universalTransition:{
+                enabled:false,
             },
             data: [],
         }
@@ -106,16 +116,6 @@ export default class WorldMap extends React.Component {
         this.myMap.on("click", this.clickHandler)
     }
 
-
-    getVisualMapMax (max) {
-        if (max <= 18) return 10
-        if (max > 18 && max < 100) return 100
-        if (max >= 100 && max < 200) return 150
-        if (max > 200 && max < 300) return 300
-        if (max > 100000) return 100000
-        else return 1000
-    }
-
     componentDidUpdate () {
         //获取当年数据
         this.mapOptions.series[0].data = this.props.getDataSource()
@@ -135,31 +135,32 @@ export default class WorldMap extends React.Component {
             this.isLoading = false
         }
         //调整最大值为向上进位
-        this.mapOptions.visualMap.max = this.getVisualMapMax(
+        this.mapOptions.visualMap.max = getVisualMapMax(
             parseFloat(this.mapOptions.series[0].data[0].value)
         )
         //为GDP调整最小值
-        if (this.mapOptions.visualMap.max > 10000) this.mapOptions.visualMap.min = 1000
+        if (this.mapOptions.visualMap.max > 10000) this.mapOptions.visualMap.min = 1000;
+        else if(this.mapOptions.visualMap.max<20) this.mapOptions.visualMap.min = 4;
         else this.mapOptions.visualMap.min = 0
 
         this.myMap.setOption(this.mapOptions, false, false)
         //检测是否需要更新国家聚焦
         if (this.props.selectCountry !== this.state.selectCountry) {
             //更新当前状态
-            this.setState({ selectCountry: this.props.selectCountry })
+            this.setState({ selectCountry: this.props.selectCountry });
             if (this.props.selectCountry === null) {
                 //取消聚焦,变回原来世界地图大小
-                this.mapOptions.series[0].center = undefined
-                this.mapOptions.series[0].layoutCenter = undefined
-                this.mapOptions.series[0].zoom = "1.1"
+                this.mapOptions.series[0].center = undefined;
+                this.mapOptions.series[0].layoutCenter = undefined;
+                this.mapOptions.series[0].zoom = 1.2;
             } else {
                 //实现聚焦,缩放至特定国家大小,模糊化,需要获取国家经纬度/中心点
                 const pack = this.props.getCountryPackage(this.props.selectCountry)
                 this.mapOptions.series[0].center = [pack.centerX, pack.centerY]
                 this.mapOptions.series[0].layoutCenter = ["50%", "50%"]
-                this.mapOptions.series[0].zoom = "9"
+                this.mapOptions.series[0].zoom = 10;
             }
-            this.myMap.setOption(this.mapOptions, false, false)
+            this.myMap.setOption(this.mapOptions, false, false);
         }
     }
 

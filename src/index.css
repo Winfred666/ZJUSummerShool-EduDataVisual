@@ -149,6 +149,7 @@ body {
 }
 
 .hoverUniDataChart {
+  top:10px;
   width: 360px;
   height: 250px;
 }
@@ -161,7 +162,7 @@ body {
 }
 
 .hoverEnrollChart {
-  top: -5px;
+  top: 10px;
   right: 30px;
   width: 360px;
   height: 250px;
@@ -186,7 +187,6 @@ body {
   height:300px;
   margin: auto;
   margin-top: 10px;
-  text-align: center;
 }
 
 

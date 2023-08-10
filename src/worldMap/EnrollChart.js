@@ -84,8 +84,6 @@ export default class EnrollChart extends React.Component {
           alignWithLabel: true
         },
         data: [
-          '2012',
-          '2013',
           '2014',
           '2015',
           '2016',
@@ -166,16 +164,16 @@ export default class EnrollChart extends React.Component {
     if (countryData === null) {
       return
     }
-    for (let q = 2012; q <= 2020; q++) {
+    for (let q = 2014; q <= 2020; q++) {
 
       if (countryData[q] === null || countryData[q] === undefined || countryData[q].dataList === null) {
-        this.collegeEnrollData[q - 2012] = 0
-        this.middleEnrollData[q - 2012] = 0
-        this.GDPData[q - 2012] = 0
+        this.collegeEnrollData[q - 2014] = 0
+        this.middleEnrollData[q - 2014] = 0
+        this.GDPData[q - 2014] = 0
       } else {
-        this.collegeEnrollData[q - 2012] = countryData[q].dataList[DataTypeEnum.CollegeEnroll].data
-        this.middleEnrollData[q - 2012] = countryData[q].dataList[DataTypeEnum.MiddleEnroll].data
-        this.GDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data
+        this.collegeEnrollData[q - 2014] = countryData[q].dataList[DataTypeEnum.CollegeEnroll].data
+        this.middleEnrollData[q - 2014] = countryData[q].dataList[DataTypeEnum.MiddleEnroll].data
+        this.GDPData[q - 2014] = countryData[q].dataList[DataTypeEnum.GDP].data
       }
     }
 

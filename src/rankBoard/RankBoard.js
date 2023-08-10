@@ -151,7 +151,8 @@ export default class RankBoard extends React.Component {
                         scroll={{
                             y: 300,
                         }} />
-                    <SummaryPie getDataByYear={this.props.getDataSource}></SummaryPie>
+                    <SummaryPie getDataByYear={this.props.getDataSource}
+                    dataType={this.props.dataType}></SummaryPie>
                 </div>
             </>
         )
