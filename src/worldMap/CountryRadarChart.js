@@ -11,8 +11,12 @@ function round (number, precision) {
   return Math.round(+number + "e" + precision) / Math.pow(10, precision)
 }
 
-function conversion (rank) {
-  return round((65 - rank) / 65, 3)
+function Rankconversion (rank, range) {
+  return round((range - rank) / range * 10, 2)
+}
+
+function conversion (data, range) {
+  return round(data / range * 10, 2)
 }
 
 export default class CountryRadarChart extends React.Component {
@@ -44,12 +48,12 @@ export default class CountryRadarChart extends React.Component {
     },
     radar: {
       indicator: [
-        { name: 'GDP', max: 250000 },
-        { name: 'top100大学', max: 1 },
-        { name: 'top1000大学', max: 1 },
-        { name: '人均教育支出(%)', max: 15 },
-        { name: '中学入学率(%)', max: 120 },
-        { name: '大学入学率(%)', max: 120 }
+        { name: 'GDP', min: -3, max: 10 },
+        { name: 'top100大学', min: -3, max: 10 },
+        { name: 'top1000大学', min: -3, max: 10 },
+        { name: '人均教育支出(%)', min: -3, max: 10 },
+        { name: '中学毛入学率(%)', min: -3, max: 10 },
+        { name: '大学毛入学率(%)', min: -3, max: 10 }
       ],
       axisName: {
         color: "rgba(27, 26, 26, 1)"
@@ -83,19 +87,19 @@ export default class CountryRadarChart extends React.Component {
       this.countryData[1] = 0
       this.countryData[2] = 0
     } else {
-      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GDP].data
-      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni].rank)
-      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank > 65 ? 0 : conversion(countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank)
-      this.countryData[3] = countryData[2020].dataList[DataTypeEnum.EduOfGDP].data > 15 ? 15 : countryData[2020].dataList[DataTypeEnum.EduOfGDP].data
-      this.countryData[4] = countryData[2020].dataList[DataTypeEnum.MiddleEnroll].data
-      this.countryData[5] = countryData[2020].dataList[DataTypeEnum.CollegeEnroll].data
+      this.countryData[0] = countryData[2020].dataList[DataTypeEnum.GDP].data > 50000 ? 10 : conversion(countryData[2020].dataList[DataTypeEnum.GDP].data, 50000)
+      this.countryData[1] = countryData[2020].dataList[DataTypeEnum.GoodUni].rank > 65 ? 0.5 : Rankconversion(countryData[2020].dataList[DataTypeEnum.GoodUni].rank, 65)
+      this.countryData[2] = countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank > 65 ? 0.5 : Rankconversion(countryData[2020].dataList[DataTypeEnum.GoodUni1k].rank, 65)
+      this.countryData[3] = countryData[2020].dataList[DataTypeEnum.EduOfGDP].data > 15 ? 10 : conversion(countryData[2020].dataList[DataTypeEnum.EduOfGDP].data, 15)
+      this.countryData[4] = conversion(countryData[2020].dataList[DataTypeEnum.MiddleEnroll].data, 160)
+      this.countryData[5] = conversion(countryData[2020].dataList[DataTypeEnum.CollegeEnroll].data, 160)
     }
 
     this.myMap.setOption(this.mapOptions, true)
   }
 
   getStyleClass = () => {
-    return "hoverChart hoverRatarChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
+    return "hoverChart hoverRadarChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
   }
   render () {
     return (<div className={this.getStyleClass()} id="CountryRadarChart">

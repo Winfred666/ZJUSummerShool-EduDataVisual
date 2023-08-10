@@ -5,6 +5,7 @@ import worldGeo from "@surbowl/world-geo-json-zh"
 import { FaultRank, TagAndUnitOfData } from "../dataSelectTab/dataStorage"
 import UniDataChart from "./UniDataChart"
 import CountryRadarChart from "./CountryRadarChart"
+import EnrollChart from "./EnrollChart"
 
 
 
@@ -50,9 +51,9 @@ export default class WorldMap extends React.Component {
                 }
                 return `${params.name} <br /> 未上榜`
             },
-            textStyle:{
+            textStyle: {
 
-                align:'left'
+                align: 'left'
             },
         },
         itemStyle: {
@@ -106,13 +107,13 @@ export default class WorldMap extends React.Component {
     }
 
 
-    getVisualMapMax(max){
-        if(max<=18) return 10;
-        if(max>18 && max<100) return 100;
-        if(max>=100 && max<200) return 150;
-        if(max>200 && max<300) return 300;
-        if(max>100000) return 100000; 
-        else return 1000;
+    getVisualMapMax (max) {
+        if (max <= 18) return 10
+        if (max > 18 && max < 100) return 100
+        if (max >= 100 && max < 200) return 150
+        if (max > 200 && max < 300) return 300
+        if (max > 100000) return 100000
+        else return 1000
     }
 
     componentDidUpdate () {
@@ -134,13 +135,13 @@ export default class WorldMap extends React.Component {
             this.isLoading = false
         }
         //调整最大值为向上进位
-        this.mapOptions.visualMap.max=this.getVisualMapMax(
+        this.mapOptions.visualMap.max = this.getVisualMapMax(
             parseFloat(this.mapOptions.series[0].data[0].value)
-        );
+        )
         //为GDP调整最小值
-        if(this.mapOptions.visualMap.max>10000) this.mapOptions.visualMap.min=1000;
-        else this.mapOptions.visualMap.min=0;
-        
+        if (this.mapOptions.visualMap.max > 10000) this.mapOptions.visualMap.min = 1000
+        else this.mapOptions.visualMap.min = 0
+
         this.myMap.setOption(this.mapOptions, false, false)
         //检测是否需要更新国家聚焦
         if (this.props.selectCountry !== this.state.selectCountry) {
@@ -208,6 +209,8 @@ export default class WorldMap extends React.Component {
             </UniDataChart>
             <CountryRadarChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
             </CountryRadarChart>
+            <EnrollChart shouldDisplay={this.getHoverMapDisplay} getDataByCountry={this.getSelectedCountryData}>
+            </EnrollChart>
         </div>)
     }
 }

@@ -8,17 +8,18 @@ import { DataTypeEnum } from "../dataSelectTab/dataStorage"
 
 echarts.use([GridComponent, LineChart, CanvasRenderer, UniversalTransition])
 
-export default class UniDataChart extends React.Component {
+export default class EnrollChart extends React.Component {
   myMap = null;
 
-  top1000UniData = [];
-  top100UniData = [];
+  collegeEnrollData = [];
+  middleEnrollData = [];
+  GDPData = [];
 
   mapOptions = {
     title: {
       left: 80,
       bottom: 15,
-      text: '国家优秀大学数目变化图',
+      text: '国家毛入学率变化图',
       textStyle: {
         color: "rgba(144, 70, 70, 1)",
         fontSize: 16,
@@ -27,8 +28,8 @@ export default class UniDataChart extends React.Component {
       }
     },
     legend: {
-      data: ['top100大学', 'top1000大学'],
-      right: 0
+      data: ['大学毛入学率', '中学毛入学率', 'GDP'],
+      right: -5
     },
     tooltip: {
       trigger: 'axis',
@@ -42,7 +43,7 @@ export default class UniDataChart extends React.Component {
     toolbox: {
       show: true,
       orient: 'horizontal',
-      left: 0,
+      left: -5,
       top: 0,
       feature: {
         mark: { show: true },
@@ -52,9 +53,6 @@ export default class UniDataChart extends React.Component {
           "optionToContent": function (opt) {
             var axisData = opt.xAxis[0].data
             var series = opt.series
-            console.log("1")
-            console.log(series)
-            console.log("2")
             var tdHeads = `<td  style="margin-top:10px; padding: 0 15px">日期</td>`
             var tdBodys = ""
             series.forEach(function (item) {
@@ -94,52 +92,71 @@ export default class UniDataChart extends React.Component {
           '2017',
           '2018',
           '2019',
-          '2020',
-          '2021',
-          '2022',
+          '2020'
         ]
       }
     ],
     yAxis: [
       {
         type: 'value',
-        name: 'top100大学',
+        name: '入学率',
         min: 0,
-        position: 'right',
+        position: 'left',
       },
       {
         type: 'value',
-        name: 'top1000大学',
+        name: 'GDP',
         min: 0,
-        position: 'left',
+        position: 'right',
+        axisLabel: {
+          margin: 2,
+          formatter: function (value, index) {
+            if (value >= 10000 && value < 10000000) {
+              value = value / 10000 + "万"
+            }
+            return value
+          }
+        },
       }
     ],
+    grid: {
+      right: 35
+    },
     series: [
       {
-        name: 'top100大学',
+        name: '大学毛入学率',
         type: 'line',
         barGap: 0,
         yAxisIndex: 0,
         emphasis: {
           focus: 'series'
         },
-        data: this.top100UniData,
+        data: this.collegeEnrollData,
       },
       {
-        name: 'top1000大学',
+        name: '中学毛入学率',
+        type: 'line',
+        yAxisIndex: 0,
+        emphasis: {
+          focus: 'series'
+        },
+        data: this.middleEnrollData,
+      },
+      {
+        name: 'GDP',
         type: 'line',
         yAxisIndex: 1,
         emphasis: {
           focus: 'series'
         },
-        data: this.top1000UniData,
+        data: this.GDPData,
       }
     ]
   };
 
   componentDidMount () {
 
-    const container = document.getElementById("UniDataChart")
+    const container = document.getElementById("EnrollChart")
     this.myMap = echarts.init(container)
     this.myMap.setOption(this.mapOptions, true)
   }
@@ -149,13 +166,16 @@ export default class UniDataChart extends React.Component {
     if (countryData === null) {
       return
     }
-    for (let q = 2012; q <= 2022; q++) {
+    for (let q = 2012; q <= 2020; q++) {
+
       if (countryData[q] === null || countryData[q] === undefined || countryData[q].dataList === null) {
-        this.top100UniData[q - 2012] = 0
-        this.top1000UniData[q - 2012] = 0
+        this.collegeEnrollData[q - 2012] = 0
+        this.middleEnrollData[q - 2012] = 0
+        this.GDPData[q - 2012] = 0
       } else {
-        this.top100UniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni].data
-        this.top1000UniData[q - 2012] = countryData[q].dataList[DataTypeEnum.GoodUni1k].data
+        this.collegeEnrollData[q - 2012] = countryData[q].dataList[DataTypeEnum.CollegeEnroll].data
+        this.middleEnrollData[q - 2012] = countryData[q].dataList[DataTypeEnum.MiddleEnroll].data
+        this.GDPData[q - 2012] = countryData[q].dataList[DataTypeEnum.GDP].data
       }
     }
 
@@ -163,10 +183,10 @@ export default class UniDataChart extends React.Component {
   }
 
   getStyleClass = () => {
-    return "hoverChart hoverUniDataChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
+    return "hoverChart hoverEnrollChart" + ((this.props.shouldDisplay()) ? " hoverChartActive" : "")
   }
   render () {
-    return (<div className={this.getStyleClass()} id="UniDataChart">
+    return (<div className={this.getStyleClass()} id="EnrollChart">
     </div>)
   }
 }

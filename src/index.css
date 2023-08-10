@@ -117,14 +117,14 @@ body {
   background-color: #fffdd7;
 }
 
-.animateSwitch{
+.animateSwitch {
   position: absolute;
   left: 50%;
   margin-left: 60px;
   margin-top: -21px;
 }
 
-.animateInline{
+.animateInline {
   display: inline-block;
 }
 
@@ -148,19 +148,26 @@ body {
   opacity: 1;
 }
 
-.hoverTopLeftChart {
+.hoverUniDataChart {
   width: 360px;
   height: 250px;
 }
 
-.hoverRatarChart {
+.hoverRadarChart {
   bottom: -5px;
   left: 30px;
   width: 360px;
   height: 250px;
 }
 
-.rankBoardTitle{
+.hoverEnrollChart {
+  top: -5px;
+  right: 30px;
+  width: 360px;
+  height: 250px;
+}
+
+.rankBoardTitle {
   grid-row: 1;
   grid-column: 2;
   border-left: 2px solid rgb(146, 207, 216);
