@@ -3,17 +3,18 @@ import Papa from 'papaparse'
 
 const CountryTransName = "ChiEngcountry"
 
-async function fetchCsvData (filePath) {
+async function fetchCsvData (fileName) {
     //fetch相对目录下的csv文件，/../../public/XXX.csv
+    //但在生产环境中，为绝对路径，需要publicPath
     //await 同步，等结果。
-    const res = await fetch(filePath)
+    const res = await fetch(process.env.PUBLIC_URL+"/"+fileName)
     let tableObj = null
     if (res.ok) {
         const strSCV = await res.text()
         tableObj = Papa.parse(strSCV, { header: true })
     } else {
         //throw `Cannot find csv file from ${filePath}.\nAn Error Occured! Code:${res.status}`;
-        console.error(`Cannot find csv file from ${filePath}.\nAn Error Occured! Code:${res.status}`)
+        console.error(`Cannot find csv file from ${fileName}.\nAn Error Occured! Code:${res.status}`)
         return []
     }
     //keyword replace to suit for api:
@@ -159,10 +160,10 @@ export default class DataStorage {
 
     async init () {
         //open the English-Chinese Dictionary for search.
-        this.dictionary = await fetchCsvData(`/${CountryTransName}.csv`)
+        this.dictionary = await fetchCsvData(`${CountryTransName}.csv`)
 
         for (let ty = 0; ty < FileName.length; ty++) {
-            const CSV = await fetchCsvData("/" + FileName[ty] + ".csv")
+            const CSV = await fetchCsvData(FileName[ty] + ".csv")
             for (let country of CSV) {
                 const bound = BoundaryYear[ty]
                 for (let year = bound.startYear; year <= bound.endYear; year++) {
