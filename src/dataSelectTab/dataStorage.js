@@ -21,7 +21,7 @@ async function fetchCsvData (fileName) {
     return tableObj.data
 }
 
-
+//错误的排名，用于标识错误数据
 export const FaultRank = 300
 
 //数据的最小形式
@@ -30,7 +30,7 @@ const Unitdata = {
     data: 0,
 }
 
-//数据类型的枚举，在未拓展之前，暂且不使用代理。
+//数据类型的枚举，在未拓展之前，暂且不使用代理枚举。
 export const DataTypeEnum = Object.freeze({
     GoodUni: 0,
     EduOfGDP: 1,
@@ -38,36 +38,64 @@ export const DataTypeEnum = Object.freeze({
     GoodUni1k: 3,
     MiddleEnroll: 4,
     GDP: 5,
-})
+});
+
+//fileName是public目录下csv的文件名(不含后缀),boundaryYear是需要录入的起始年份和结束年份，
+//tag是可视化框架称呼该数据的标签，unit是该数据的单位。
+const ConstMetaData= Object.freeze([
+    {
+        fileName:"Top100University",
+        boundaryYear:{ startYear: 2012, endYear: 2023 },
+        tag: "优质大学(前100)",
+        unit: "所",
+    },
+    {
+        fileName:"EduExpenseOfGDP",
+        boundaryYear:{ startYear: 2012, endYear: 2020 },
+        tag: "教育支出占GDP比重",
+        unit: "%",
+    },{
+        fileName:"CollegeEnrollRate",
+        boundaryYear:{ startYear: 2012, endYear: 2020 },
+        tag: "大学毛入学率",
+        unit: "%" 
+    },{
+        fileName:"Top1000University",
+        boundaryYear:{ startYear: 2014, endYear: 2023 },
+        tag: "优质大学(前1k)",
+        unit: "所" 
+    },{
+        fileName:"MiddleEnrollRate",
+        boundaryYear:{ startYear: 2012, endYear: 2020 },
+        tag: "中学毛入学率",
+        unit: "%" 
+    },{
+        fileName:"GDP",
+        boundaryYear:{ startYear: 2012, endYear: 2020 },
+        tag: "GDP",
+        unit: "亿美元" 
+    },
+    
+]);
 
 //数据表名称
-const FileName = Object.freeze([
-    "Top100University",
-    "EduExpenseOfGDP",
-    "CollegeEnrollRate",
-    "Top1000University",
-    "MiddleEnrollRate",
-    "GDP",
-])
+const FileName = []
 
 //开始时间和结束时间
-export const BoundaryYear = Object.freeze([
-    { startYear: 2012, endYear: 2023 },
-    { startYear: 2012, endYear: 2020 },
-    { startYear: 2012, endYear: 2020 },
-    { startYear: 2014, endYear: 2023 },
-    { startYear: 2012, endYear: 2020 },
-    { startYear: 2012, endYear: 2020 },
-])
+export const BoundaryYear = [];
+
 //数据单位
-export const TagAndUnitOfData = Object.freeze([
-    { tag: "优质大学(前100)", unit: "所" },
-    { tag: "教育支出占GDP比重", unit: "%" },
-    { tag: "大学毛入学率", unit: "%" },
-    { tag: "优质大学(前1k)", unit: "所" },
-    { tag: "中学毛入学率", unit: "%" },
-    { tag: "GDP", unit: "亿美元" },
-])
+export const TagAndUnitOfData = [];
+
+for(let oneMeta of ConstMetaData){
+    FileName.push(oneMeta.fileName);
+    BoundaryYear.push(oneMeta.boundaryYear);
+    TagAndUnitOfData.push({
+        tag:oneMeta.tag,
+        unit:oneMeta.unit,
+    })
+}
+
 
 //一个国家，一个时间点的数据
 class DataPerCPerY {
@@ -85,12 +113,9 @@ class DataPerCPerY {
         this.country = country
         this.name = name
         this.year = year
-        this.dataList = [Object.create(Unitdata)
-            , Object.create(Unitdata),
-        Object.create(Unitdata),
-        Object.create(Unitdata),
-        Object.create(Unitdata),
-        Object.create(Unitdata)]
+        this.dataList = [];
+        const len=FileName.length;
+        for(let q=0;q<len;q++) this.dataList.push(Object.create(Unitdata));
     }
 
     setData (dataType, rank, data) {
