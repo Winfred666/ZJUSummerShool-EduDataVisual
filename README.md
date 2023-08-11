@@ -1,6 +1,6 @@
 # ZJU SummerSchool-Data Visualization-Example
 
-这是浙江大学2023数据可视化暑期学校的小组合作作业，利用世界银行的入学率等教育数据，和大学排名网上的数据，简单地做了一个仪表盘。仅供交流学习。
+ㅤㅤ这是浙江大学2023数据可视化暑期学校的小组合作作业，利用世界银行的入学率等教育数据，和大学排名网上的数据，简单地做了一个仪表盘。仅供交流学习。
 ### **1. 项目配置**
 ㅤㅤ经典地，将项目克隆到本地，在终端中输入```npm install```即可安装好全部依赖项。再输入```npm start```即可预览、测试项目。<br/>
 ㅤㅤ若要部署项目到服务器，需要先更改根目录下的.env.production文件，将其中PUBLIC_URL的值换成自己服务器的域名路径前缀，以正确定位到资源。再使用```npm run build```将项目打包。
@@ -48,9 +48,11 @@ const ConstMetaData= Object.freeze([
 ]);
 ```
 
-  之后图表组件绑定数据的部分，可以直接根据这个datatype的键获取数据。
+  ㅤㅤ之后图表组件绑定数据的部分，可以直接根据这个datatype的键获取数据。
   ```js
   getDataByYear(DataTypeEnum.MyNewDataType,2020);
   //获取一个数组，表示该年所有国家的数据，已经将MyNewDataType数据装填到value中，返回的结果可以直接作为echart图表options中series[0]的data。
   ```
-  最后，在减数据时，得把worldMap目录中硬编码的CountryRadarChart.js、EnrollChart.js、UniDataChart.js删去，并在WorldMap.js中删去它们的组件引用。或者可以魔改它们，在聚焦到国家时显示什么图表都可以。
+  ㅤㅤ在减数据时，得把worldMap目录中硬编码的CountryRadarChart.js、EnrollChart.js、UniDataChart.js删去，并在WorldMap.js中删去它们的组件引用。或者可以魔改它们，在聚焦到国家时显示什么图表都可以。
+
+  ㅤㅤ最后，若未来zjuer不小心(X)选上该短学期课程，可以多预习react，特别是数据绑定与组件传值；并在数据的有趣程度、图表的联动（即点选/框选一处，多处变化）上下功夫。
